@@ -5,7 +5,7 @@
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
 ;; Version 1.0
 ;; Keywords: C, Makefile, compilation
-;; URL: https://github.com/nick96/basic-c-compile/blob/master/basic-c-compile.el
+;; URL: https://github.com/nick96/basic-c-compile
 
 ;;; Commentary:
 
