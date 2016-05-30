@@ -1,10 +1,24 @@
-;; Small Emacs script for basic C file commands
-;; It has the following functionality:
-                                        ; Create a simple Makefile for a C file
-                                        ;   in the same directory as the file
-                                        ; Compile the file to an output file of the same name
-                                        ; Run the output file and print the output to a temporary buffer
+;;; basic-c-compile.el --- Quickly create a basic Makefile, compile and run a C program
 
+;; Copyright (C) 2016 Nick Spain
+
+;; Author: Nick Spain <nicholas.spain96@gmail.com>
+;; Version 1.0
+;; Keywords: C, Makefile, compilation
+;; URL: TODO insert URL
+
+;;; Commentary:
+
+;; basic-c-compile.el is a basic script for C programming. It can create a basic
+;; Makefile, compile the C program (with or without the Makefile) and run the
+;; file.
+
+;; This package assumes that a single C file is being compiled, however, the
+;; Makefile is easily editted.
+
+;;; Code:
+
+;; TODO write function that ensure working directory is correct (maybe?)
 
 ;; Compile file to output file of same name
 
@@ -12,8 +26,9 @@
 (defun compile-sans-makefile ()
   "Compiles current file without the need for a Makefile"
   (shell-command-to-string (format "gcc -Wall -o %s %s"
-                                   (file-name-sans-extension (buffer-file-name))
-                                   (buffer-file-name))))
+                                   (file-name-sans-extension (buffer-name))
+                                   (buffer-name))))
+
 
 ;; Compile with Makefile
 (defun compile-with-makefile ()
@@ -21,16 +36,32 @@
   (shell-command-to-string "make"))
 
 
-
 ;; Create a Makefile
+
+;; Contents of Makefile
+(setq makefile-contents
+      (format (concat "CC=gcc\n"
+                      "INFILE=%s\n"
+                      "OUTFILE=%s.o\n\n"
+                      "build: $(INFILE)\n\t"
+                      "$(CC) -o $(OUTFILE) $(INFILE)\n\n"
+                      "clean:\n\t rm -f *.o \n\n"
+                      "rebuild: clean build")
+              (buffer-name) (file-name-sans-extension (buffer-name))))
+
 (defun create-makefile ()
   "Create a basic Makefile for the current file, in the same directory"
-  (let (makefile-contents
-        (concat "CC=gcc\n INFILE=%s\n OUTFILE=%s\n\n build: %(INFILE)\n\t $(CC) -o $(OUTFILE) %(INFILE)\n\n"
-                "clean:\n\t rm -f *.o \n\n"
-                "rebuild: clean build")
-        (buffer-file-name) (file-name-sans-extension (buffer-file-name)))
-    (shell-command-to-string (format "cd %s && touch Makefile && echo %s >> Makefile"
-                                     (file-name-directory (buffer-file-name)) makefile-contents))))
+  (write-region
+   makefile-contents
+   nil
+   "Makefile"))
 
 
+;; Run file
+(defun run-c-file ()
+  "Run the file with the output printing in a temporary buffer"
+  (shell-command-to-string
+   (format "./%s"
+           (file-name-sans-extension (buffer-name)))))
+
+;;; basic-c-compile.el ends here

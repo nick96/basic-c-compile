@@ -24,3 +24,6 @@ will compile the current file using the makefile in the same directory.
 
 The file can also be run using the `run-current-buffer`. This will print the
 output to a temporary buffer which can be quit by pressing 'q'.
+
+This package assumes that a single C file is being compiled, however, it is easy
+to edit the Makefile to allow multiple files to be compiled together.
