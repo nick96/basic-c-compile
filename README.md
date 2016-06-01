@@ -18,11 +18,15 @@ clean:
 rebuild: clean build
 ```
 
-Compilation can be done with or without the Makefile `compile-with-makefile` 
-will compile the current file using the makefile in the same directory. 
-`compile-sans-makefile` will compile the file without the Makefile (using gcc).
+File can be compiled with or without a Makefile. This is done by calling
+`compile-file`. This gives the option (y or n) of compiling with or without
+a makefile. If yes, the program checks for a Makefile. If there is one present
+it calls `make rebuild` (assuming the style of the  Makefile shown above).
+Otherwise, the program creates the Makefile and compiles the file. If you want
+to compile the file without a Makefile, press "n" at the prompt and
+`gcc -Wall -o <file-sans-extension>.o <file>` will be calls instead.
 
-The file can also be run using the `run-current-buffer`. This will print the
+The file can also be run using  `run-c-file`. This will print the
 output to a temporary buffer which can be quit by pressing 'q'.
 
 This package assumes that a single C file is being compiled, however, it is easy
