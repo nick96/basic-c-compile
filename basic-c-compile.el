@@ -18,12 +18,25 @@
 ;; Makefile is easily edited.
 
 ;;;###autoload
-(defun basic-c-compile-file ()
+(defun compile-file ()
+  "Compile file with or without a Makefile."
   (interactive)
-  (compile-sans-makefile)
-  (compile-with-makefile)
-  (create-makefile)
-  (run-c-file))
+  (let ((path (shell-quote-argument (file-name-directory (buffer-file-name))))
+        (file (shell-quote-argument (buffer-file-name))))
+    (if (y-or-n-p "Compile with Makefile?")
+        (dolist (file-name (directory-files path))))
+          (if (file-exists-p "Makefile")
+              (if (file-exists-p (file-name-sans-extension file))
+                  (compile-with-makefile "rebuild")
+                (compile-with-makefile "build"))
+            (create-makefile file))
+      (compile-sans-makefile file)))
+
+(defun run-c ()
+  "Run the program."
+  (interactive)
+  (run-c-file (buffer-file-name)))
+
 
 ;;; Code:
 
@@ -31,46 +44,48 @@
 ;; Compile file to output file of same name
 
 ;; Compile without Makefile
-(defun compile-sans-makefile ()
-  "Compiles current file without the need for a Makefile."
-  (shell-command-to-string (format "gcc -Wall -o %s %s"
-                                   (file-name-sans-extension (buffer-name))
-                                   (buffer-name))))
+(defun compile-sans-makefile (file)
+  "Compiles FILE without the need for a Makefile."
+  (compile (format "gcc -Wall -o %s %s"
+                   (file-name-sans-extension file)
+                   file)))
 
 
 ;; Compile with Makefile
-(defun compile-with-makefile ()
-  "Compile current file with the Makefile in the same directory."
-  (shell-command-to-string "make"))
+(defun compile-with-makefile (arg)
+  "Compile FILE with the Makefile in the same directory."
+  (compile (format "make %s" arg)))
 
 
 ;; Create a Makefile
 
 ;; Contents of Makefile
-(defvar makefile-contents
-  (format (concat "CC=gcc\n"
-                  "INFILE=%s\n"
-                  "OUTFILE=%s.o\n\n"
-                  "build: $(INFILE)\n\t"
-                  "$(CC) -o $(OUTFILE) $(INFILE)\n\n"
-                  "clean:\n\t rm -f *.o \n\n"
-                  "rebuild: clean build")
-          (buffer-name) (file-name-sans-extension (buffer-name))))
 
-(defun create-makefile ()
-  "Create a basic Makefile for the current file, in the same directory."
+(defun create-makefile (file)
+  "Create a basic Makefile for FILE, in the same directory."
+  (let ((makefile-contents
+         (format (concat "CC=gcc\n"
+                         "INFILE=%s\n"
+                         "OUTFILE=%s.o\n\n"
+                         "build: $(INFILE)\n\t"
+                         "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
+                         "clean:\n\t rm -f *.o \n\n"
+                         "rebuild: clean build")
+                 file (file-name-sans-extension file))))
   (write-region
    makefile-contents
    nil
-   "Makefile"))
+   (concat (file-name-directory file) "Makefile"))))
 
 
 ;; Run file
-(defun run-c-file ()
-  "Run the file with the output printing in a temporary buffer."
+(defun run-c-file (file)
+  "Run FILE with the output printing in a temporary buffer."
   (shell-command-to-string
    (format "./%s"
-           (file-name-sans-extension (buffer-name)))))
+           (file-name-sans-extension file))))
+
+
 
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
