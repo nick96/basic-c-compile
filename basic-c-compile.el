@@ -17,6 +17,14 @@
 ;; This package assumes that a single C file is being compiled, however, the
 ;; Makefile is easily edited.
 
+;;;###autoload
+(defun basic-c-compile-file ()
+  (interactive)
+  (compile-sans-makefile)
+  (compile-with-makefile)
+  (create-makefile)
+  (run-c-file))
+
 ;;; Code:
 
 
