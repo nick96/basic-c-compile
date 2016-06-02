@@ -49,7 +49,7 @@
   (let ((path (file-name-directory (buffer-file-name)))
         (file (buffer-name)))
     
-    (if (y-or-n-p "Compile with Makefile?")
+    (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
         (dolist (file-name (directory-files path))))
           (if (file-exists-p "Makefile")
@@ -80,7 +80,7 @@
 
 ;; Compile with Makefile
 (defun compile-with-makefile (arg)
-  "Compile file using the Makefile with specified ARG (build, clean, rebuild)"
+  "Compile file using the Makefile with specified ARG (build, clean, rebuild)."
   (compile (format "make %s" arg)))
 
 
