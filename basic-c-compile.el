@@ -21,7 +21,7 @@
 (defun makefile ()
   "Create a Makefile of the form shown in README."
   (interactive)
-  (create-makefile (buffer-file-name)))
+  (create-makefile (buffer-name)))
 
 (defun compile-file ()
   "Compile file with or without a Makefile."
@@ -36,7 +36,8 @@
               (if (file-exists-p (file-name-sans-extension file))
                   (compile-with-makefile "rebuild")
                 (compile-with-makefile "build"))
-            (create-makefile file))
+            (create-makefile file)
+            (compile-with-makefile "build"))
       (compile-sans-makefile file)))
 
 (defun run-c ()
@@ -87,7 +88,7 @@
 ;; Run file
 (defun run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
-  (shell-command-to-string
+  (compile
    (format "./%s"
            (file-name-sans-extension file))))
 
