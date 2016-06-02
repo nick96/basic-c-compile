@@ -18,12 +18,19 @@
 ;; Makefile is easily edited.
 
 ;;;###autoload
+(defun makefile ()
+  "Create a Makefile of the form shown in README."
+  (interactive)
+  (create-makefile (buffer-file-name)))
+
 (defun compile-file ()
   "Compile file with or without a Makefile."
   (interactive)
-  (let ((path (shell-quote-argument (file-name-directory (buffer-file-name))))
-        (file (shell-quote-argument (buffer-file-name))))
+  (let ((path (file-name-directory (buffer-file-name)))
+        (file (buffer-name)))
+    
     (if (y-or-n-p "Compile with Makefile?")
+        ;; Check for presence of Makefile to stop creating duplicates
         (dolist (file-name (directory-files path))))
           (if (file-exists-p "Makefile")
               (if (file-exists-p (file-name-sans-extension file))
@@ -35,8 +42,7 @@
 (defun run-c ()
   "Run the program."
   (interactive)
-  (run-c-file (buffer-file-name)))
-
+  (run-c-file (buffer-name)))
 
 ;;; Code:
 
@@ -53,7 +59,7 @@
 
 ;; Compile with Makefile
 (defun compile-with-makefile (arg)
-  "Compile FILE with the Makefile in the same directory."
+  "Compile file using the Makefile with specified ARG (build, clean, rebuild)"
   (compile (format "make %s" arg)))
 
 
@@ -84,8 +90,6 @@
   (shell-command-to-string
    (format "./%s"
            (file-name-sans-extension file))))
-
-
 
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
