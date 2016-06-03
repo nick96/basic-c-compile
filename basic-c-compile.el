@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.0
+;; Version: 1.1
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
 
@@ -63,7 +63,8 @@
 (defun run-c ()
   "Run the program."
   (interactive)
-  (run-c-file (buffer-name)))
+  (run-c-file (buffer-name))
+  (other-window 1))
 
 ;;; Code:
 
