@@ -38,17 +38,19 @@
 ;; Makefile is easily edited.
 
 ;;;###autoload
-(defun makefile ()
+(defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
   (interactive)
-  (create-makefile (buffer-name)))
+  (create-makefile (buffer-file-name)))
 
-(defun compile-file ()
+;;;###autoload
+(defun basic-c-compile-file ()
   "Compile file with or without a Makefile."
   (interactive)
+  ;; Define local scope variables
   (let ((path (file-name-directory (buffer-file-name)))
-        (file (buffer-name)))
-    
+        (file (buffer-file-name)))
+    ;; Makefile control flow
     (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
         (dolist (file-name (directory-files path))))
@@ -60,10 +62,11 @@
             (compile-with-makefile "build"))
       (compile-sans-makefile file)))
 
-(defun run-c ()
+;;;###autoload
+(defun basic-c-compile-run-c ()
   "Run the program."
   (interactive)
-  (run-c-file (buffer-name))
+  (run-c-file (buffer-file-name))
   (other-window 1))
 
 ;;; Code:
@@ -75,8 +78,8 @@
 (defun compile-sans-makefile (file)
   "Compiles FILE without the need for a Makefile."
   (compile (format "gcc -Wall -o %s %s"
-                   (file-name-sans-extension file)
-                   file)))
+                   (shell-quote-argument (file-name-sans-extension file))
+                   (shell-quote-argument file))))
 
 
 ;; Compile with Makefile
@@ -99,7 +102,7 @@
                          "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
-                 file (file-name-sans-extension file))))
+                 (shell-quote-argument file) (shell-quote-argument (file-name-sans-extension file)))))
   (write-region
    makefile-contents
    nil
@@ -111,7 +114,7 @@
   "Run FILE with the output printing in a temporary buffer."
   (compile
    (format "./%s"
-           (file-name-sans-extension file))))
+           (shell-quote-argument (file-name-sans-extension file)))))
 
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
