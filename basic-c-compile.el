@@ -66,7 +66,7 @@
 (defun basic-c-compile-run-c ()
   "Run the program."
   (interactive)
-  (run-c-file (buffer-file-name))
+  (run-c-file (file-name-nondirectory (buffer-file-name)))
   (other-window 1))
 
 ;;; Code:
