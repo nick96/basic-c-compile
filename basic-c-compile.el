@@ -60,7 +60,8 @@
                 (basic-c-compile--with-makefile "build"))
             (basic-c-compile--create-makefile file)
             (basic-c-compile--with-makefile "build"))
-      (basic-c-compile--sans-makefile file)))
+          (basic-c-compile--sans-makefile file))
+  (other-window 1))
 
 ;;;###autoload
 (defun basic-c-compile-run-c ()
@@ -85,7 +86,8 @@
 ;; Compile with Makefile
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean, rebuild)."
-  (compile (format "make %s" arg)))
+  (compile (format "make %s"
+                   arg)))
 
 
 ;; Create a Makefile
@@ -102,19 +104,18 @@
                          "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
-                 (shell-quote-argument file) (shell-quote-argument (file-name-sans-extension file)))))
-  (write-region
-   makefile-contents
-   nil
-   (concat (file-name-directory file) "Makefile"))))
+                 (shell-quote-argument file)
+                 (shell-quote-argument (file-name-sans-extension file)))))
+  (write-region makefile-contents
+                nil
+                (concat (file-name-directory file) "Makefile"))))
 
 
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
-  (compile
-   (format "./%s.o"
-           (shell-quote-argument (file-name-sans-extension file)))))
+  (compile (format "./%s.o"
+                   (shell-quote-argument (file-name-sans-extension file)))))
 
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
