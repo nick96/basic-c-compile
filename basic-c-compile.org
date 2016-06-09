@@ -1,0 +1,14 @@
+* basic-c-compile package [0/2]
+- [ ] Add different compiler options
+- [ ] Add support for multiple files
+  - User can mark files they want to be compiled by Makefile or use all
+    - Use dired as base?
+    - Check for .c or .h extension
+** TODO Introduce mode features [0/4]
+  - [ ] Indentation
+    - Choice of styles
+      - Start with linux and google
+  - [ ] Autocomplete for functions and variables within file (or project)
+    - Not complete support for language (is annoying)
+  - [ ] Syntax highlighting
+  - [ ] Inbuild flycheck instead of flymake
