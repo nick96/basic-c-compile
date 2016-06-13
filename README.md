@@ -35,7 +35,7 @@ Makefile is structured as expected. If no file is found, then `make
 build` will be run. If you choose to run without a Makefile, 
 `gcc -Wall -o <file-name>.o <file-name>.c` will be run. 
 
-## makefile
+## basic-c-compile-makefile
 
 This is a really simple command that just creates a Makefile in the form
 shown above.
@@ -45,7 +45,7 @@ with a `.c` extension but it would be quite easy to edit this in. The
 main reason it is not implemented is because I've never had to compile
 multiple files together.
 
-## run-c
+## basic-c-compile-run-c
 
 This command runs the output file `<file-name>.o` with `./<file-name>.o`.
 
