@@ -67,8 +67,7 @@
 (defun basic-c-compile-run-c ()
   "Run the program."
   (interactive)
-  (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name)))
-  (other-window 1))
+  (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
 
 ;;; Code:
 
@@ -104,11 +103,11 @@
                          "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
-                 (shell-quote-argument file)
-                 (shell-quote-argument (file-name-sans-extension file)))))
+                 (shell-quote-argument (file-name-nondirectory file))
+                 (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
   (write-region makefile-contents
                 nil
-                (concat (file-name-directory file) "Makefile"))))
+                "Makefile")))
 
 
 ;; Run file

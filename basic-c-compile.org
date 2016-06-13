@@ -4,11 +4,13 @@
   - User can mark files they want to be compiled by Makefile or use all
     - Use dired as base?
     - Check for .c or .h extension
-** TODO Introduce mode features [0/4]
+** TODO Introduce mode features [0/5]
   - [ ] Indentation
     - Choice of styles
       - Start with linux and google
   - [ ] Autocomplete for functions and variables within file (or project)
-    - Not complete support for language (is annoying)
+    - Not complete support for language
+      - Is annoying
   - [ ] Syntax highlighting
   - [ ] Inbuild flycheck instead of flymake
+  - [ ] Add windows support
