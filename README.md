@@ -21,12 +21,12 @@ clean:
 rebuild: clean build 
 ```
 
-This package allows three commands to be called: `compile-file`,
-`makefile` and `run-c`.
+This package allows three commands to be called: `basic-c-compile-file`,
+`basic-c-compile-makefile` and `basic-c-compile-run-c`.
 
-## compile-file 
+## basic-c-compile-file 
 
-The command `compile-file` initially checks if you want to compile
+This command initially checks if you want to compile
 with or without a Makefile (just press 'y' or 'n').  If you press 'y',
 it will check for a Makefile in the file's directory. If there is one
 present, it will check for of the form `<file-name>.o`. Upon finding
@@ -49,7 +49,15 @@ multiple files together.
 
 This command runs the output file `<file-name>.o` with `./<file-name>.o`.
 
-
+# TODO
+- Allow a choice of compiler
+	- At the moment this has to be done by editing Makefile
+- Make compatible with windows
+	- Recognise system and change things like `./<file-name>.o`
+- Recognise if the file has multiple files and give the following option:
+	1. Choose files to be included in compilation
+	2. Include all files in compilation
+	3. Only include current file in compilation
 
 
 
