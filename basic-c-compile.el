@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.1
+;; Version: 1.1.1
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
 
