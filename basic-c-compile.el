@@ -69,39 +69,47 @@
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
 
 ;;; Code:
-
+;; Global variables
+;; These can be changed by the user in their init file
+(defvar basic-c-compile-compiler "gcc") ; Change to whatever compiler you prefer
+(defvar basic-c-compile-all-files t) ; Compile all .c and .h files in directory
 
 ;; Compile file to output file of same name
 
 ;; Compile without Makefile
 (defun basic-c-compile--sans-makefile (file)
   "Compiles FILE without the need for a Makefile."
-  (compile (format "gcc -Wall -o %s.o %s"
-                   (shell-quote-argument (file-name-sans-extension file))
-                   (shell-quote-argument file))))
+  (let (files-to-compile (if basic-c-compile-all-files
+                            (map #'shell-quote-argument (remove-if-not #'(lambda (x)
+                                               (string-match "*.c" x))))
+                          (shell-quote-argument file)))
+
+  (compile (format "%S -Wall %S -o %S.o"
+                   basic-c-compile-compiler
+                   files-to-compile
+                   (shell-quote-argument (file-name-sans-extension file))))))
 
 
 ;; Compile with Makefile
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean, rebuild)."
-  (compile (format "make %s"
+  (compile (format "make %S"
                    arg)))
 
 
 ;; Create a Makefile
 
-;; Contents of Makefile
-
 (defun basic-c-compile--create-makefile (file)
   "Create a basic Makefile for FILE, in the same directory."
   (let ((makefile-contents
-         (format (concat "CC=gcc\n"
-                         "INFILE=%s\n"
-                         "OUTFILE=%s.o\n\n"
+         (format (concat "CC=%S\n"
+                         "INFILE=%S\n"
+                         "OUTFILE=%S.o\n\n"
                          "build: $(INFILE)\n\t"
                          "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
+                 basic-c-compile-compiler
                  (shell-quote-argument (file-name-nondirectory file))
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
   (write-region makefile-contents
@@ -112,7 +120,7 @@
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
-  (compile (format "./%s.o"
+  (compile (format "./%S.o"
                    (shell-quote-argument (file-name-sans-extension file)))))
 
 (provide 'basic-c-compile)
