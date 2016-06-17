@@ -114,7 +114,7 @@
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
                  basic-c-compile-compiler
-                 (basic-c-compile--files-to-compile)
+                 (basic-c-compile--files-to-compile file)
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
   (write-region makefile-contents
                 nil
