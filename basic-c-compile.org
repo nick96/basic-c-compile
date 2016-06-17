@@ -4,6 +4,15 @@
   - User can mark files they want to be compiled by Makefile or use all
     - Use dired as base?
     - Check for .c or .h extension
+** TODO Fixes [0/2]
+  - [ ] Don't switch to compilation buffer
+  - [ ] Auto quit compilation when finished
+    - Leave open but move back to file buffer to allow editing
+      - Bonus:
+        - Highlight errors
+        - Move to first error
+          - Allow tabing through?
+        - User can set if warnings are included too
 ** TODO Introduce mode features [0/5]
   - [ ] Indentation
     - Choice of styles
