@@ -26,7 +26,7 @@
 ;; Version: 1.1.1
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
-
+;; Package-Requires: ((cl-lib ""))
 
 ;;; Commentary:
 
