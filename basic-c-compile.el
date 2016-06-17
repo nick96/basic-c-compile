@@ -91,7 +91,7 @@
   (compile (format "%S -Wall %S -o %S.o"
                    basic-c-compile-compiler
                    (files-to-compile)
-                   (shell-quote-argument (file-name-sans-extension file))))))
+                   (shell-quote-argument (file-name-sans-extension file)))))))
 
 
 ;; Compile with Makefile
