@@ -36,7 +36,7 @@
 
 ;; This package assumes that a single C file is being compiled, however, the
 ;; Makefile is easily edited.
-
+(require 'cl-lib)
 ;;;###autoload
 (defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
