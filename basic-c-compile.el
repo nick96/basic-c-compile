@@ -79,7 +79,7 @@
 
 (defun basic-c-compile--files-to-compile (file)
     (if basic-c-compile-all-files
-        (map #'shell-quote-argument (remove-if-not #'(lambda (x) (string-match "*.c" x))
+        (map #'shell-quote-argument (cl-remove-if-not #'(lambda (x) (string-match "*.c" x))
                                                    (directory-files (file-name-directory file))))
       (shell-quote-argument file)))
 
