@@ -69,29 +69,39 @@
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
 
 ;;; Code:
+
 ;; Global variables
 ;; These can be changed by the user in their init file
 (defvar basic-c-compile-compiler "gcc") ; Change to whatever compiler you prefer
-(defvar basic-c-compile-all-files t) ; Compile all .c and .h files in directory
+;; basic-c-compile-all-files can be "all" (or t), "selection" or nil
+(defvar basic-c-compile-all-files t)
 
 
-;; Compile file to output file of same name
+;; Function called when user wants to specify a subset of the files to compile
+(defun basic-c-compile--choose-files ()
+  "Return string of files entered in the minibuffer."
+  (read-string "Enter list of files: "))
 
+;; Returned file list is based on the option set in basic-c-compile-all-files
 (defun basic-c-compile--files-to-compile (file)
-    (if basic-c-compile-all-files
-        (map #'shell-quote-argument (cl-remove-if-not #'(lambda (x) (string-match "*.c" x))
-                                                   (directory-files (file-name-directory file))))
-      (shell-quote-argument file)))
+  "Return a list of the files to compile which are in the same directory as FILE."
+  (cond (basic-c-compile-all-files
+         (mapconcat 'identity
+                    (map #'shell-quote-argument
+                         (cl-remove-if-not #'(lambda (x) (string-match "*.c" x))
+                                           (directory-files (file-name-directory file))))
+                    (shell-quote-argument file)))
+        ((equal basic-c-compile-all-files "selection")
+         (basic-c-compile--choose-files))
+        (t file)))
 
 ;; Compile without Makefile
 (defun basic-c-compile--sans-makefile (file)
   "Compiles FILE without the need for a Makefile."
-  (let (files-to-compile
-
-  (compile (format "%S -Wall %S -o %S.o"
-                   basic-c-compile-compiler
-                   (files-to-compile)
-                   (shell-quote-argument (file-name-sans-extension file)))))))
+        (compile (format "%S -Wall %S -o %S.o"
+                         basic-c-compile-compiler
+                         (basic-c-compile--files-to-compile file)
+                         (shell-quote-argument (file-name-sans-extension file)))))
 
 
 ;; Compile with Makefile
