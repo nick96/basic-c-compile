@@ -60,8 +60,7 @@
                 (basic-c-compile--with-makefile "build"))
             (basic-c-compile--create-makefile file)
             (basic-c-compile--with-makefile "build"))
-          (basic-c-compile--sans-makefile file))
-  (other-window 1))
+          (basic-c-compile--sans-makefile file)))
 
 ;;;###autoload
 (defun basic-c-compile-run-c ()
