@@ -74,19 +74,23 @@
 (defvar basic-c-compile-compiler "gcc") ; Change to whatever compiler you prefer
 (defvar basic-c-compile-all-files t) ; Compile all .c and .h files in directory
 
+
 ;; Compile file to output file of same name
+
+(defun basic-c-compile--files-to-compile (file)
+    (if basic-c-compile-all-files
+        (map #'shell-quote-argument (remove-if-not #'(lambda (x) (string-match "*.c" x))
+                                                   (directory-files (file-name-directory file))))
+      (shell-quote-argument file)))
 
 ;; Compile without Makefile
 (defun basic-c-compile--sans-makefile (file)
   "Compiles FILE without the need for a Makefile."
-  (let (files-to-compile (if basic-c-compile-all-files
-                            (map #'shell-quote-argument (remove-if-not #'(lambda (x)
-                                               (string-match "*.c" x))))
-                          (shell-quote-argument file)))
+  (let (files-to-compile
 
   (compile (format "%S -Wall %S -o %S.o"
                    basic-c-compile-compiler
-                   files-to-compile
+                   (files-to-compile)
                    (shell-quote-argument (file-name-sans-extension file))))))
 
 
@@ -106,11 +110,11 @@
                          "INFILE=%S\n"
                          "OUTFILE=%S.o\n\n"
                          "build: $(INFILE)\n\t"
-                         "$(CC) -Wall -o $(OUTFILE) $(INFILE)\n\n"
+                         "$(CC) -Wall $(INFILE)  -o $(OUTFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
                  basic-c-compile-compiler
-                 (shell-quote-argument (file-name-nondirectory file))
+                 (basic-c-compile--files-to-compile)
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
   (write-region makefile-contents
                 nil
