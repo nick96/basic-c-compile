@@ -37,6 +37,8 @@
 ;; This package assumes that a single C file is being compiled, however, the
 ;; Makefile is easily edited.
 
+;;; Code:
+
 (require 'cl-lib)
 
 ;;;###autoload
@@ -69,8 +71,6 @@
   "Run the program."
   (interactive)
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
-
-;;; Code:
 
 ;; Global variables
 ;; These can be changed by the user in their init file
