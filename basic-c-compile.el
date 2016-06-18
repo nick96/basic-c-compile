@@ -43,8 +43,9 @@
 (defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
   (interactive)
-  (basic-c-compile--create-makefile (buffer-file-name)))
+  (basic-c-compile--create-makefile buffer-file-name))
 
+(basic-c-compile-makefile)
 ;;;###autoload
 (defun basic-c-compile-file ()
   "Compile file with or without a Makefile."
@@ -109,7 +110,7 @@
 ;; Compile without Makefile
 (defun basic-c-compile--sans-makefile (file)
   "Compiles FILE without the need for a Makefile."
-        (compile (format "%S -Wall %S -o %S.o"
+        (compile (format "%s -Wall %s -o %s.o"
                          basic-c-compile-compiler
                          (basic-c-compile--files-to-compile file)
                          (shell-quote-argument (file-name-sans-extension file)))))
@@ -118,7 +119,7 @@
 ;; Compile with Makefile
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean, rebuild)."
-  (compile (format "make %S"
+  (compile (format "make %s"
                    arg)))
 
 
@@ -127,9 +128,9 @@
 (defun basic-c-compile--create-makefile (file)
   "Create a basic Makefile for FILE, in the same directory."
   (let ((makefile-contents
-         (format (concat "CC=%S\n"
-                         "INFILE=%S\n"
-                         "OUTFILE=%S.o\n\n"
+         (format (concat "CC = %s\n"
+                         "INFILE = %s\n"
+                         "OUTFILE = %s.o\n\n"
                          "build: $(INFILE)\n\t"
                          "$(CC) -Wall $(INFILE)  -o $(OUTFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
@@ -145,7 +146,7 @@
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
-  (compile (format "./%S.o"
+  (compile (format "./%s.o"
                    (shell-quote-argument (file-name-sans-extension file)))))
 
 (provide 'basic-c-compile)
