@@ -26,7 +26,7 @@
 ;; Version: 1.1.1
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
-;; Package-Requires: ((cl-lib))
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;;; Commentary:
 
@@ -36,7 +36,9 @@
 
 ;; This package assumes that a single C file is being compiled, however, the
 ;; Makefile is easily edited.
+
 (require 'cl-lib)
+
 ;;;###autoload
 (defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
@@ -48,19 +50,19 @@
   "Compile file with or without a Makefile."
   (interactive)
   ;; Define local scope variables
-  (let ((path (file-name-directory (buffer-file-name)))
-        (file (buffer-file-name)))
+  (let* ((path (file-name-directory (buffer-file-name)))
+         (infile (buffer-file-name))
+         (outfile (concat (file-name-sans-extension infile) ".o")))
     ;; Makefile control flow
     (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
-        (dolist (file-name (directory-files path))))
-          (if (file-exists-p "Makefile")
-              (if (file-exists-p (file-name-sans-extension file))
+        (if (member "Makefile" (directory-files path))
+              (if (member outfile (directory-files path))
                   (basic-c-compile--with-makefile "rebuild")
                 (basic-c-compile--with-makefile "build"))
-            (basic-c-compile--create-makefile file)
+            (basic-c-compile--create-makefile infile)
             (basic-c-compile--with-makefile "build"))
-          (basic-c-compile--sans-makefile file)))
+          (basic-c-compile--sans-makefile infile))))
 
 ;;;###autoload
 (defun basic-c-compile-run-c ()
@@ -73,27 +75,36 @@
 ;; Global variables
 ;; These can be changed by the user in their init file
 (defvar basic-c-compile-compiler "gcc") ; Change to whatever compiler you prefer
-;; basic-c-compile-all-files can be "all" (or t), "selection" or nil
-(defvar basic-c-compile-all-files t)
+;; basic-c-compile-all-files can be "all", "selection"
+;; Any other value will mean that only the current file is compiled
+(defvar basic-c-compile-all-files "all")
 
 
 ;; Function called when user wants to specify a subset of the files to compile
 (defun basic-c-compile--choose-files ()
-  "Return string of files entered in the minibuffer."
-  (read-string "Enter list of files: "))
+  "Return string of files entered in the mini-buffer."
+  (let ((file-list (read-string "Enter file names: ")))
+    file-list))
+
 
 ;; Returned file list is based on the option set in basic-c-compile-all-files
+;; FIX ME Failing with (wrong-type-argument stringp nil)
 (defun basic-c-compile--files-to-compile (file)
   "Return a list of the files to compile which are in the same directory as FILE."
-  (cond (basic-c-compile-all-files
+  (cond (;; Make list of all .c files in directory
+         (equal basic-c-compile-all-files "all")
          (mapconcat 'identity
-                    (map #'shell-quote-argument
-                         (cl-remove-if-not #'(lambda (x) (string-match "*.c" x))
-                                           (directory-files (file-name-directory file))))
-                    (shell-quote-argument file)))
-        ((equal basic-c-compile-all-files "selection")
-         (basic-c-compile--choose-files))
-        (t file)))
+                    (mapcar #'shell-quote-argument
+                         (cl-remove-if-not #'(lambda (x) (equal (cdr (split-string x "\\."))
+                                                                '("c")))
+                                           (directory-files (file-name-directory
+                                                             file))))
+                    " "))
+         (;; Call function that allows input of files to be compiled
+          (equal basic-c-compile-all-files "selection")
+          (basic-c-compile--choose-files))
+         (;; Default to only compiling the current file
+          t file)))
 
 ;; Compile without Makefile
 (defun basic-c-compile--sans-makefile (file)
