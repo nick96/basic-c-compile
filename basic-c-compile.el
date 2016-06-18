@@ -45,7 +45,6 @@
   (interactive)
   (basic-c-compile--create-makefile buffer-file-name))
 
-(basic-c-compile-makefile)
 ;;;###autoload
 (defun basic-c-compile-file ()
   "Compile file with or without a Makefile."
