@@ -34,9 +34,6 @@
 ;; Makefile, compile the C program (with or without the Makefile) and run the
 ;; file.
 
-;; This package assumes that a single C file is being compiled, however, the
-;; Makefile is easily edited.
-
 ;;; Code:
 
 (require 'cl-lib)
