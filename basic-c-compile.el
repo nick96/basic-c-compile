@@ -35,15 +35,43 @@
 ;; file.
 
 ;;; Code:
+;; DONE Is it possible to reduce the number of global variables
+;; called within function (functional style)
+;; Use them as arguments instead
+;; DONE Put buffer file name in brackets, makes it a bit clearer
+;; HOWTO Test functions that use compile
+;; HOWTO Test interactive functions
 
 (require 'cl-lib)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Global variables
+;; These can be changed by the user in their init file
+
+;; Change to whatever compiler you prefer
+(defvar basic-c-compile-compiler "gcc")
+
+;; basic-c-compile-all-files can be "all", "selection"
+;; Any other value will mean that only the current file is compiled
+(defvar basic-c-compile-all-files "all")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Autoload functions
+
+;; TODO TEST
 ;;;###autoload
 (defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
   (interactive)
-  (basic-c-compile--create-makefile buffer-file-name))
+  (basic-c-compile--create-makefile basic-c-compile-compiler
+                                    (basic-c-compile--files-to-compile basic-c-compile-all-files
+                                                                       (buffer-file-name))
+                                    (buffer-file-name)
+                                    "Makefile"))
 
+;; TODO TEST
 ;;;###autoload
 (defun basic-c-compile-file ()
   "Compile file with or without a Makefile."
@@ -59,70 +87,91 @@
               (if (member outfile (directory-files path))
                   (basic-c-compile--with-makefile "rebuild")
                 (basic-c-compile--with-makefile "build"))
-            (basic-c-compile--create-makefile infile)
-            (basic-c-compile--with-makefile "build"))
-          (basic-c-compile--sans-makefile infile))))
+          ;; FIXME Should this be in 'progn'
+          (basic-c-compile--create-makefile basic-c-compile-compiler
+                                            (basic-c-compile--files-to-compile basic-c-compile-all-files
+                                                                               (buffer-file-name))
+                                            infile
+                                            "Makefile")
+          (basic-c-compile--with-makefile "build"))
+      ;; end of progn?
+      (basic-c-compile--sans-makefile basic-c-compile-compiler
+                                      (basic-c-compile--files-to-compile basic-c-compile-all-files
+                                                                         (buffer-file-name))
+                                      infile))))
 
+;; TODO TEST
 ;;;###autoload
 (defun basic-c-compile-run-c ()
   "Run the program."
   (interactive)
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
 
-;; Global variables
-;; These can be changed by the user in their init file
-(defvar basic-c-compile-compiler "gcc") ; Change to whatever compiler you prefer
-;; basic-c-compile-all-files can be "all", "selection"
-;; Any other value will mean that only the current file is compiled
-(defvar basic-c-compile-all-files "all")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+;; HOWTO Simulate input
+;; TODO TEST
 ;; Function called when user wants to specify a subset of the files to compile
 (defun basic-c-compile--choose-files ()
   "Return string of files entered in the mini-buffer."
-  (let ((file-list (read-string "Enter file names: ")))
-    file-list))
+  (let ((selected-files (read-string "Enter file names: ")))
+    selected-files))
 
+;; Helper predicate for basic-c-compile--files-to-compile
+(defun basic-c-compile--c-file-extension-p (file-name)
+  "Return t if FILE-NAME has extension '.c', otherwise nil."
+  (equal (last (split-string file-name "\\."))
+         '("c")))
 
-;; Returned file list is based on the option set in basic-c-compile-all-files
-;; FIX ME Failing with (wrong-type-argument stringp nil)
-(defun basic-c-compile--files-to-compile (file)
-  "Return a list of the files to compile which are in the same directory as FILE."
+;; TODO TEST
+;; Returned file list is based on the option set in
+;; basic-c-compile-all-files.  If "all", then all the files in current
+;; directory.  If "selected" then you're propmpted for
+;; input. Otherwise, only the current file is compiled.
+(defun basic-c-compile--files-to-compile (var-files-to-compile file)
+  "Return a list of files to compile.
+Contents of list depends VAR-FILES-TO-COMPILE.  If 'all' then all '.c' files in
+FILE directory will be compiled."
   (cond (;; Make list of all .c files in directory
-         (equal basic-c-compile-all-files "all")
+         (equal var-files-to-compile "all")
          (mapconcat 'identity
                     (mapcar #'shell-quote-argument
-                         (cl-remove-if-not #'(lambda (x) (equal (cdr (split-string x "\\."))
-                                                                '("c")))
-                                           (directory-files (file-name-directory
-                                                             file))))
+                            (cl-remove-if-not #'basic-c-compile--c-file-extension-p
+                                              (directory-files (file-name-directory file))))
                     " "))
          (;; Call function that allows input of files to be compiled
-          (equal basic-c-compile-all-files "selection")
+          (equal var-files-to-compile "selection")
           (basic-c-compile--choose-files))
          (;; Default to only compiling the current file
           t file)))
 
+;; TODO TEST
 ;; Compile without Makefile
-(defun basic-c-compile--sans-makefile (file)
-  "Compiles FILE without the need for a Makefile."
+(defun basic-c-compile--sans-makefile (compiler
+                                       files-to-compile
+                                       file)
+  "Use COMPILER without a Makefile to compile FILES-TO-COMPILE as the name of current FILE."
         (compile (format "%s -Wall %s -o %s.o"
-                         basic-c-compile-compiler
-                         (basic-c-compile--files-to-compile file)
+                         compiler
+                         files-to-compile
                          (shell-quote-argument (file-name-sans-extension file)))))
 
-
+;; TODO TEST
 ;; Compile with Makefile
 (defun basic-c-compile--with-makefile (arg)
-  "Compile file using the Makefile with specified ARG (build, clean, rebuild)."
+  "Compile file using the Makefile with specified ARG (build, clean or rebuild)."
   (compile (format "make %s"
                    arg)))
 
-
+;; TODO TEST
+;; This allows sandbox testing
 ;; Create a Makefile
-
-(defun basic-c-compile--create-makefile (file)
-  "Create a basic Makefile for FILE, in the same directory."
+(defun basic-c-compile--create-makefile (compiler
+                                         files-to-compile
+                                         file
+                                         makefile)
+  "Use COMPILER on FILES-TO-COMPILE to make out-file with same name as FILE.
+Compilation rules are from MAKEFILE."
   (let ((makefile-contents
          (format (concat "CC = %s\n"
                          "INFILE = %s\n"
@@ -131,19 +180,19 @@
                          "$(CC) -Wall $(INFILE)  -o $(OUTFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
-                 basic-c-compile-compiler
-                 (basic-c-compile--files-to-compile file)
+                 compiler
+                 files-to-compile
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
   (write-region makefile-contents
                 nil
-                "Makefile")))
+                makefile)))
 
-
+;; TODO TEST
+;; Testing this is similar to compiling with Makefile
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
   (compile (format "./%s.o"
                    (shell-quote-argument (file-name-sans-extension file)))))
-
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
