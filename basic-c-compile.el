@@ -36,11 +36,11 @@
 
 ;;; Code:
 ;; DONE Is it possible to reduce the number of global variables
-;; called within function (functional style)
-;; Use them as arguments instead
+;; called within function (functional style). Use them as arguments instead
 ;; DONE Put buffer file name in brackets, makes it a bit clearer
 ;; HOWTO Test functions that use compile
 ;; HOWTO Test interactive functions
+;; HOWTO Simulate user input into function
 
 (require 'cl-lib)
 
@@ -109,11 +109,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; HOWTO Simulate input
-;; TODO TEST
+
 ;; Function called when user wants to specify a subset of the files to compile
 (defun basic-c-compile--choose-files ()
-  "Return string of files entered in the mini-buffer."
+  "Return string of SELECTED-FILES which can be entered from the mini-buffer."
   (let ((selected-files (read-string "Enter file names: ")))
     selected-files))
 
@@ -123,15 +122,15 @@
   (equal (last (split-string file-name "\\."))
          '("c")))
 
-;; TODO TEST
-;; Returned file list is based on the option set in
-;; basic-c-compile-all-files.  If "all", then all the files in current
-;; directory.  If "selected" then you're propmpted for
-;; input. Otherwise, only the current file is compiled.
-(defun basic-c-compile--files-to-compile (var-files-to-compile file)
+;; TEST DONE
+(defun basic-c-compile--files-to-compile (var-files-to-compile
+                                          file
+                                          &optional str-files-to-compile)
   "Return a list of files to compile.
 Contents of list depends VAR-FILES-TO-COMPILE.  If 'all' then all '.c' files in
-FILE directory will be compiled."
+FILE directory will be compiled.  For selected; if STR-FILES-TO-COMPILE is
+specified, then files in that list will be compiled (this is mostly for testing
+purposes)."
   (cond (;; Make list of all .c files in directory
          (equal var-files-to-compile "all")
          (mapconcat 'identity
@@ -141,12 +140,17 @@ FILE directory will be compiled."
                     " "))
          (;; Call function that allows input of files to be compiled
           (equal var-files-to-compile "selection")
-          (basic-c-compile--choose-files))
+          (if str-files-to-compile
+              str-files-to-compile
+            (basic-c-compile--choose-files)))
          (;; Default to only compiling the current file
           t file)))
 
-;; TODO TEST
-;; Compile without Makefile
+
+
+
+
+;; TODO HOWTO TEST
 (defun basic-c-compile--sans-makefile (compiler
                                        files-to-compile
                                        file)
@@ -156,16 +160,13 @@ FILE directory will be compiled."
                          files-to-compile
                          (shell-quote-argument (file-name-sans-extension file)))))
 
-;; TODO TEST
-;; Compile with Makefile
+;; TODO HOWTO TEST
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean or rebuild)."
   (compile (format "make %s"
                    arg)))
 
 ;; TODO TEST
-;; This allows sandbox testing
-;; Create a Makefile
 (defun basic-c-compile--create-makefile (compiler
                                          files-to-compile
                                          file
@@ -187,7 +188,9 @@ Compilation rules are from MAKEFILE."
                 nil
                 makefile)))
 
-;; TODO TEST
+;; (ert-deftest create-makefile-test () )
+
+;; TODO HOWTO TEST
 ;; Testing this is similar to compiling with Makefile
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
