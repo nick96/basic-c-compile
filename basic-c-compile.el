@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.1.1
+;; Version: 1.1.2
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -35,32 +35,30 @@
 ;; file.
 
 ;;; Code:
-;; DONE Is it possible to reduce the number of global variables
-;; called within function (functional style). Use them as arguments instead
-;; DONE Put buffer file name in brackets, makes it a bit clearer
-;; HOWTO Test functions that use compile
-;; HOWTO Test interactive functions
-;; HOWTO Simulate user input into function
 
 (require 'cl-lib)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Global variables
 ;; These can be changed by the user in their init file
 
 ;; Change to whatever compiler you prefer
-(defvar basic-c-compile-compiler "gcc")
+(defcustom basic-c-compile-compiler "gcc"
+  "Compiler used to by basic-c-compile to compile file(s)."
+  :group 'basic-c-compile)
 
 ;; basic-c-compile-all-files can be "all", "selection"
 ;; Any other value will mean that only the current file is compiled
-(defvar basic-c-compile-all-files "all")
+(defcustom basic-c-compile-all-files "all"
+  "Changes the files compiled by basic-c-compile.
+'all' will compile all files in directory.  'selection' will give you a prompt
+to list the file.  Any other setting will only compile the current file."
+  :group 'basic-c-compile)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Autoload functions
+;; Interactive function
 
-;; TODO TEST
+;; TODO TEST basic-c-compile-makefile (interactive)
 ;;;###autoload
 (defun basic-c-compile-makefile ()
   "Create a Makefile of the form shown in README."
@@ -71,7 +69,7 @@
                                     (buffer-file-name)
                                     "Makefile"))
 
-;; TODO TEST
+;; TODO TEST basic-c-compile-file (interactive)
 ;;;###autoload
 (defun basic-c-compile-file ()
   "Compile file with or without a Makefile."
@@ -87,20 +85,18 @@
               (if (member outfile (directory-files path))
                   (basic-c-compile--with-makefile "rebuild")
                 (basic-c-compile--with-makefile "build"))
-          ;; FIXME Should this be in 'progn'
-          (basic-c-compile--create-makefile basic-c-compile-compiler
+          (progn (basic-c-compile--create-makefile basic-c-compile-compiler
                                             (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                                (buffer-file-name))
                                             infile
                                             "Makefile")
-          (basic-c-compile--with-makefile "build"))
-      ;; end of progn?
+          (basic-c-compile--with-makefile "build")))
       (basic-c-compile--sans-makefile basic-c-compile-compiler
                                       (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                          (buffer-file-name))
                                       infile))))
 
-;; TODO TEST
+;; TODO TEST basic-c-compile-run-c (interactive)
 ;;;###autoload
 (defun basic-c-compile-run-c ()
   "Run the program."
@@ -109,6 +105,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Non-interactive functions
 
 ;; Function called when user wants to specify a subset of the files to compile
 (defun basic-c-compile--choose-files ()
@@ -122,7 +119,6 @@
   (equal (last (split-string file-name "\\."))
          '("c")))
 
-;; TEST DONE
 (defun basic-c-compile--files-to-compile (var-files-to-compile
                                           file
                                           &optional str-files-to-compile)
@@ -146,11 +142,6 @@ purposes)."
          (;; Default to only compiling the current file
           t file)))
 
-
-
-
-
-;; TODO HOWTO TEST
 (defun basic-c-compile--sans-makefile (compiler
                                        files-to-compile
                                        file)
@@ -160,19 +151,17 @@ purposes)."
                          files-to-compile
                          (shell-quote-argument (file-name-sans-extension file)))))
 
-;; TODO HOWTO TEST
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean or rebuild)."
   (compile (format "make %s"
                    arg)))
 
-;; TODO TEST
 (defun basic-c-compile--create-makefile (compiler
                                          files-to-compile
                                          file
                                          makefile)
-  "Use COMPILER on FILES-TO-COMPILE to make out-file with same name as FILE.
-Compilation rules are from MAKEFILE."
+  "Create makefile of rules for compiler COMPILER on FILES-TO-COMPILE.
+Out-file will have name FILE.o and makefile will be written to MAKEFILE."
   (let ((makefile-contents
          (format (concat "CC = %s\n"
                          "INFILE = %s\n"
@@ -184,13 +173,11 @@ Compilation rules are from MAKEFILE."
                  compiler
                  files-to-compile
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
-  (write-region makefile-contents
-                nil
-                makefile)))
+    (write-region makefile-contents
+                  nil
+                  makefile)))
 
-;; (ert-deftest create-makefile-test () )
 
-;; TODO HOWTO TEST
 ;; Testing this is similar to compiling with Makefile
 ;; Run file
 (defun basic-c-compile--run-c-file (file)
