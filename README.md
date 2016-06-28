@@ -66,3 +66,6 @@ compiled.
 - Make compatible with windows
 	- Recognise system and change things like `./<file-name>.o`
 Not done yet as I have no windows machine to test it on.
+
+- Make automated tests for interactive functions.
+Not sure how to go about this so if anyone has suggestions let me know.
