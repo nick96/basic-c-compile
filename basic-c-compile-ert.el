@@ -97,9 +97,9 @@ Using compiler COMPILER for FILES-TO-COMPILE and naming out-file FILE.o."
     (unwind-protect
         (progn (with-temp-file file (basic-c-compile--create-makefile compiler file file makefile))
                (should (file-exists-p file))
-               (should (file-exist-p makefile))
+               (should (file-exists-p makefile))
                (should (equal (read-file makefile)
-                              (apprpriate-makefile-contents compiler
+                              (appropriate-makefile-contents compiler
                                                             file
                                                             file))))
       (progn (delete-file "test.c")
