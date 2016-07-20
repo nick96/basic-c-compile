@@ -105,5 +105,9 @@ Using compiler COMPILER for FILES-TO-COMPILE and naming out-file FILE.o."
       (progn (delete-file "test.c")
              (delete-file "Makefile")))))
 
+;; Test file when it's installed
+;; Ert is a build in package so there is no need to test for its presence
+(eval-when-compile (ert t))
+
 (provide 'basic-c-compile-ert)
 ;;; basic-c-compile-ert.el ends here
