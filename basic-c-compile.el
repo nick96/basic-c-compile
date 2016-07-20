@@ -65,7 +65,7 @@ to list the file.  Any other setting will only compile the current file."
   (interactive)
   (basic-c-compile--create-makefile basic-c-compile-compiler
                                     (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                       (buffer-file-name))
+                                                                       (file-name-nondirectory (buffer-file-name)))
                                     (buffer-file-name)
                                     "Makefile"))
 
@@ -178,8 +178,6 @@ Out-file will have name FILE.o and makefile will be written to MAKEFILE."
                   makefile)))
 
 
-;; Testing this is similar to compiling with Makefile
-;; Run file
 (defun basic-c-compile--run-c-file (file)
   "Run FILE with the output printing in a temporary buffer."
   (compile (format "./%s.o"
