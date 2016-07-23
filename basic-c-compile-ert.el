@@ -31,35 +31,42 @@
 ;; Unit testing for basic-c-compile
 
 ;;; Code:
-(require 'basic-c-compile)
+(load-library "basic-c-compile.el")
 (require 'ert)
 
-;; TODO create temp file (makes more general so can run on any machine)
+;; Calls some function with nil, not string
 (ert-deftest files-to-compile-all-test ()
-  (let* ((file-path "~/Google Drive/Programming/C/kernighan_ritchie/word_count/word_count.c")
-        (dir-c-files (mapconcat 'identity
-                                (cl-remove-if-not #'basic-c-compile--c-file-extension-p
-                                                            (directory-files (file-name-directory file-path)))
-                                " ")))
-    ;; Test that all '.c' files are return when 'all' argument is used.
-    (should (equal (basic-c-compile--files-to-compile "all" file-path)
-                   dir-c-files))))
+  (let ((tmp-files '("test1.c" "test2.c" "test3.c" "test4.c"))
+        (file-path (buffer-file-name)))
+   (dolist (file tmp-files)
+    (write-region "" nil file))
+   (let ((dir-c-files (mapconcat 'symbol-name
+                                 (cl-remove-if-not #'basic-c-compile--c-file-extension-p
+                                                   (directory-files (file-name-directory file-path)))
+                                 " ")))
+     ;; Create some C file temporarily to work with
+     ;; Collect C files into a string
+     ;; Test that all '.c' files are return when 'all' argument is used.
+     (should (equal (basic-c-compile--files-to-compile "all" file-path)
+                           dir-c-files))
+     (dolist (file tmp-files)
+       (when (file-exists-p file)
+         (delete-file file))))))
 
-;; TODO create temp file (makes more general so can run on any machine)
+
 ;; Test when 'selection' argument is used
 (ert-deftest files-to-compile-selection-test ()
   (let ((str-files-to-comp "test1.c test2.c test3.c test4.c")
-        (file-path "~/Google Drive/Programming/C/kernighan_ritchie/word_count/word_count.c"))
+        (file-path (buffer-file-name)))
     (should (equal (basic-c-compile--files-to-compile "selection"
                                                       file-path
                                                       str-files-to-comp)
                    str-files-to-comp))))
 
-;; TODO create temp file (makes more general so can run on any machine)
 ;; Test that only the input file is return when argument is not 'all'
 ;; or 'selection'.
 (ert-deftest files-to-compile-nil-test ()
-  (let ((file-path  "~/Google Drive/Programming/C/kernighan_ritchie/word_count/word_count.c"))
+  (let ((file-path  (buffer-file-name)))
     (should (equal (basic-c-compile--files-to-compile nil file-path)
                    file-path))))
 
@@ -72,20 +79,23 @@
 
 (defun appropriate-makefile-contents (compiler
                                       files-to-compile
-                                      file)
+                                      file
+                                      compiler-flags)
   "Return a string of what the Makefile should contain.
-Using compiler COMPILER for FILES-TO-COMPILE and naming out-file FILE.o."
+Using compiler COMPILER for FILES-TO-COMPILE and naming out-file FILE.o which is compiled with COMPILER-FLAGS."
   (let ((makefile-contents
          (format (concat "CC = %s\n"
                          "INFILE = %s\n"
-                         "OUTFILE = %s.o\n\n"
+                         "OUTFILE = %s.o\n"
+                         "FLAGS = %s\n\n"
                          "build: $(INFILE)\n\t"
-                         "$(CC) -Wall $(INFILE)  -o $(OUTFILE)\n\n"
+                         "$(CC) $(FLAGS) $(INFILE)  -o $(OUTFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
                  compiler
                  files-to-compile
-                 (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
+                 (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file)))
+                 compiler-flags)))
   makefile-contents))
 
 ;; Test basic-c-compile--create-makefile but remove the file once done
@@ -93,15 +103,21 @@ Using compiler COMPILER for FILES-TO-COMPILE and naming out-file FILE.o."
 (ert-deftest create-makefile-single-file-test ()
   (let ((compiler "gcc")
         (makefile "Makefile")
-        (file "test.c"))
+        (file "test.c")
+        (compiler-flags "-Wall"))
     (unwind-protect
-        (progn (with-temp-file file (basic-c-compile--create-makefile compiler file file makefile))
+        (progn (with-temp-file file (basic-c-compile--create-makefile compiler
+                                                                      file
+                                                                      file
+                                                                      compiler-flags
+                                                                      makefile))
                (should (file-exists-p file))
                (should (file-exists-p makefile))
                (should (equal (read-file makefile)
                               (appropriate-makefile-contents compiler
                                                             file
-                                                            file))))
+                                                            file
+                                                            compiler-flags))))
       (progn (delete-file "test.c")
              (delete-file "Makefile")))))
 

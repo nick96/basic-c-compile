@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.1.2
+;; Version: 1.2.1
 ;; Keywords: C, Makefile, compilation
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -41,6 +41,11 @@
 ;; Global variables
 ;; These can be changed by the user in their init file
 
+(defgroup basic-c-compile nil
+  "Quickly create a makefile, compile and run your C program."
+  :prefix "basic-c-compile-"
+  :group 'tools)
+
 ;; Change to whatever compiler you prefer
 (defcustom basic-c-compile-compiler "gcc"
   "Compiler used to by basic-c-compile to compile file(s)."
@@ -52,6 +57,10 @@
   "Changes the files compiled by basic-c-compile.
 'all' will compile all files in directory.  'selection' will give you a prompt
 to list the file.  Any other setting will only compile the current file."
+  :group 'basic-c-compile)
+
+(defcustom basic-c-compile-compiler-flags "-Wall"
+  "String of flags for compiler."
   :group 'basic-c-compile)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -67,6 +76,7 @@ to list the file.  Any other setting will only compile the current file."
                                     (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                        (file-name-nondirectory (buffer-file-name)))
                                     (buffer-file-name)
+                                    basic-c-compile-compiler-flags
                                     "Makefile"))
 
 ;; TODO TEST basic-c-compile-file (interactive)
@@ -87,13 +97,14 @@ to list the file.  Any other setting will only compile the current file."
                 (basic-c-compile--with-makefile "build"))
           (progn (basic-c-compile--create-makefile basic-c-compile-compiler
                                             (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                               (buffer-file-name))
+                                                                               (file-name-nondirectory (buffer-file-name)))
                                             infile
+                                            basic-c-compile-compiler-flags
                                             "Makefile")
           (basic-c-compile--with-makefile "build")))
       (basic-c-compile--sans-makefile basic-c-compile-compiler
                                       (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                         (buffer-file-name))
+                                                                         (file-name-nondirectory (buffer-file-name)))
                                       infile))))
 
 ;; TODO TEST basic-c-compile-run-c (interactive)
@@ -159,20 +170,24 @@ purposes)."
 (defun basic-c-compile--create-makefile (compiler
                                          files-to-compile
                                          file
+                                         compiler-flags
                                          makefile)
   "Create makefile of rules for compiler COMPILER on FILES-TO-COMPILE.
-Out-file will have name FILE.o and makefile will be written to MAKEFILE."
+Out-file will have name FILE.o compiled with
+flags COMPILER-FLAGS and makefile will be written to MAKEFILE."
   (let ((makefile-contents
          (format (concat "CC = %s\n"
                          "INFILE = %s\n"
-                         "OUTFILE = %s.o\n\n"
+                         "OUTFILE = %s.o\n"
+                         "FLAGS = %s\n\n"
                          "build: $(INFILE)\n\t"
-                         "$(CC) -Wall $(INFILE)  -o $(OUTFILE)\n\n"
+                         "$(CC) $(FLAGS) $(INFILE)  -o $(OUTFILE)\n\n"
                          "clean:\n\t rm -f *.o \n\n"
                          "rebuild: clean build")
                  compiler
                  files-to-compile
-                 (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file))))))
+                 (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file)))
+                 compiler-flags)))
     (write-region makefile-contents
                   nil
                   makefile)))
