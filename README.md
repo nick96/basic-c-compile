@@ -54,18 +54,20 @@ file will be included.
 This command runs the output file `<file-name>.o` with `./<file-name>.o`.
 
 ## Settings
-There are two variables that you can set.
-1. `basic-c-compile-compiler`
-This chooses the compiler that is used to compile the file(s). By default
-it is gcc.
-2. `basic-c-compile-all-files`
-This is explained above but just quickly, it allows you to choose which files are
-compiled.
 
-# TODO
-- Make compatible with windows
-	- Recognise system and change things like `./<file-name>.o`
-Not done yet as I have no windows machine to test it on.
+All customisable setting can be found in the customisation menu
+(`M-x customize-variable`). They are in the group `basic-c-compile` which is in the `tools` section. You can also change them in your init file with:
+`(setq <variable-name> <variable-value>)`.
 
-- Make automated tests for interactive functions.
-Not sure how to go about this so if anyone has suggestions let me know.
+1. `basic-c-compile-compiler`: This chooses the compiler that is used
+   to compile the file(s). By default it is "gcc"".
+2. `basic-c-compile-all-files`: This is explained above but just
+   quickly, it allows you to choose which files are compiled. By
+   default it is "all".
+3. `basic-c-compile-compiler-flags`: This is one string containing all
+   flags files are compiled with. By default it is "-Wall".
+4. `basic-c-compiler-auto-comp`: This is a boolean variable defining
+   whether or not out of date binary files are compiled. If it is
+   true, then when `basic-c-compile-run-c` is called, it will check if
+   the file's binary is up to date. If it isn't, then
+   `basic-c-compile-file` will be called.

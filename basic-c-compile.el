@@ -23,8 +23,8 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.2.1
-;; Keywords: C, Makefile, compilation
+;; Version: 1.2.2
+;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
 
@@ -33,6 +33,14 @@
 ;; basic-c-compile.el is a basic script for C programming.  It can create a basic
 ;; Makefile, compile the C program (with or without the Makefile) and run the
 ;; file.
+
+;;; Change log:
+;; 29-Jul-2016 Nick Spain
+;;    Add option basic-c-compile-auto-comp, this gives basic-c-compile
+;;    the ability to automatically compile out of date binaries before
+;;    run time.
+;;    Update doc-strings.
+
 
 ;;; Code:
 
@@ -46,31 +54,41 @@
   :prefix "basic-c-compile-"
   :group 'tools)
 
-;; Change to whatever compiler you prefer
+
 (defcustom basic-c-compile-compiler "gcc"
-  "Compiler used to by basic-c-compile to compile file(s)."
+  "Compiler used to by `basic-c-compile' to compile file(s)."
   :group 'basic-c-compile)
 
-;; basic-c-compile-all-files can be "all", "selection"
-;; Any other value will mean that only the current file is compiled
 (defcustom basic-c-compile-all-files "all"
-  "Changes the files compiled by basic-c-compile.
-'all' will compile all files in directory.  'selection' will give you a prompt
-to list the file.  Any other setting will only compile the current file."
+  "Changes the selection of files compiled.
+'all' will compile all files in directory.  'selection' will give
+you a prompt to list the file.  Any other setting will only
+compile the current file."
   :group 'basic-c-compile)
 
 (defcustom basic-c-compile-compiler-flags "-Wall"
   "String of flags for compiler."
   :group 'basic-c-compile)
 
+(defcustom basic-c-compile-auto-comp t
+  "Boolean option for automatically compiling out of date binary files.
+This variable is check when `basic-c-compile-run-c' is called.  If it is true
+then the source file(s) are recompiled."
+  :group 'basic-c-compile)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Interactive function
+;; Interactive functions
 
-;; TODO TEST basic-c-compile-makefile (interactive)
 ;;;###autoload
 (defun basic-c-compile-makefile ()
-  "Create a Makefile of the form shown in README."
+  "Create a Makefile of the form shown in README.
+This function uses the variables `basic-c-compile-compiler',
+`basic-c-compile-all-files' and `basic-c-compile-compiler-flags'.
+It uses `basic-c-compile--files-to-compile' in conjunction with
+`basic-c-compiler-all-files' to determine files to be the
+Makefile's INFILE."
   (interactive)
   (basic-c-compile--create-makefile basic-c-compile-compiler
                                     (basic-c-compile--files-to-compile basic-c-compile-all-files
@@ -79,10 +97,15 @@ to list the file.  Any other setting will only compile the current file."
                                     basic-c-compile-compiler-flags
                                     "Makefile"))
 
-;; TODO TEST basic-c-compile-file (interactive)
 ;;;###autoload
 (defun basic-c-compile-file ()
-  "Compile file with or without a Makefile."
+  "Compile file with or without a Makefile.
+A y-or-n prompt is called to determine if you want to use the
+Makefile of not.  If you say yes ('y') and there is no Makefile
+in the directory then one is make using
+`basic-c-compile--makefile'.  The presence of a binary file is
+check for, if there is not one then 'rebuild' is called,
+otherwise 'build' is called."
   (interactive)
   ;; Define local scope variables
   (let* ((path (file-name-directory (buffer-file-name)))
@@ -107,12 +130,19 @@ to list the file.  Any other setting will only compile the current file."
                                                                          (file-name-nondirectory (buffer-file-name)))
                                       infile))))
 
-;; TODO TEST basic-c-compile-run-c (interactive)
 ;;;###autoload
 (defun basic-c-compile-run-c ()
-  "Run the program."
+  "Run the program.
+If the C source file is new than the binary file and
+`basic-c-compile-auto-comp' is true, then the file will be
+compiled before it is run."
   (interactive)
-  (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
+  (when (not (file-newer-than-file-p (buffer-file-name)
+                                   (concat (file-name-nondirectory (buffer-file-name))
+                                           ".o")))
+    (when basic-c-compile-auto-comp
+      (basic-c-compile-file)))
+      (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -124,7 +154,7 @@ to list the file.  Any other setting will only compile the current file."
   (let ((selected-files (read-string "Enter file names: ")))
     selected-files))
 
-;; Helper predicate for basic-c-compile--files-to-compile
+
 (defun basic-c-compile--c-file-extension-p (file-name)
   "Return t if FILE-NAME has extension '.c', otherwise nil."
   (equal (last (split-string file-name "\\."))
@@ -197,5 +227,7 @@ flags COMPILER-FLAGS and makefile will be written to MAKEFILE."
   "Run FILE with the output printing in a temporary buffer."
   (compile (format "./%s.o"
                    (shell-quote-argument (file-name-sans-extension file)))))
+
+
 (provide 'basic-c-compile)
 ;;; basic-c-compile.el ends here
