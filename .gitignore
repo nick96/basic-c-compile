@@ -1,3 +1,6 @@
 *.org
 *.elc
 .projectile
+.dir-locals.el
+dist/
+.cask/
