@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.3.0
+;; Version: 1.5.1
 ;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -35,7 +35,14 @@
 ;; file.
 
 ;;; Change log:
+;; 30-Jul-2016    Nick Spain
+;;
+;;    Add basic-c-compile-outfile-extension and
+;;    basic-c-compile-make-clean, plus update commands that utilise
+;;    them. Update customisable variables to have options.
+;;
 ;; 29-Jul-2016 Nick Spain
+;;
 ;;    Add option basic-c-compile-auto-comp, this gives basic-c-compile
 ;;    the ability to automatically compile out of date binaries before
 ;;    run time.
@@ -46,7 +53,7 @@
 
 (require 'cl-lib)
 
-;; Global variables
+;; User customisation
 ;; These can be changed by the user in their init file
 
 (defgroup basic-c-compile nil
@@ -56,25 +63,48 @@
 
 
 (defcustom basic-c-compile-compiler "gcc"
-  "Compiler used to by `basic-c-compile' to compile file(s)."
-  :group 'basic-c-compile)
+  "Compiler used to by basic-c-compile to compile file(s)."
+  :group 'basic-c-compile
+  :options '("clang"))
 
 (defcustom basic-c-compile-all-files "all"
   "Changes the selection of files compiled.
 'all' will compile all files in directory.  'selection' will give
 you a prompt to list the file.  Any other setting will only
 compile the current file."
-  :group 'basic-c-compile)
+  :group 'basic-c-compile
+  :options '("all" "selection" nil))
 
 (defcustom basic-c-compile-compiler-flags "-Wall"
   "String of flags for compiler."
-  :group 'basic-c-compile)
+  :group 'basic-c-compile
+  :options '("-Wall -Werror"))
 
 (defcustom basic-c-compile-auto-comp t
   "Boolean option for automatically compiling out of date binary files.
 This variable is check when `basic-c-compile-run-c' is called.  If it is true
 then the source file(s) are recompiled."
-  :group 'basic-c-compile)
+  :group 'basic-c-compile
+  :options '(nil))
+
+(defcustom basic-c-compile-outfile-extension "o"
+  "String of extension to put onto the end of the outfile.
+This variable is 'o' by default.  If you do change this variable
+then you must also change `basic-c-compile-make-clean'."
+  :group 'basic-c-compile
+  :options '(nil "a"))
+
+(defcustom basic-c-compile-make-clean "rm -f *.o"
+  "String of line or lines to put in Makefile's clean section.
+This option is set to 'rm -f *.o' because by default the
+`basic-c-compile-outfile-extension' is set to 'o'.  This makes it
+easier to just have general command to remove the
+outfile.  However, the convention is to have no extension.  Do
+this by setting `basic-c-compile-outfile-extension' to nil.  Doing
+so means you will have to change this variable as well."
+  :group 'basic-c-compile
+  :options '("find . -type f -executable -delete"
+             "gfind . -type f -executable -delete"))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -94,7 +124,9 @@ Makefile's INFILE."
                                     (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                        (file-name-nondirectory (buffer-file-name)))
                                     (buffer-file-name)
+                                    basic-c-compile-outfile-extension
                                     basic-c-compile-compiler-flags
+                                    basic-c-compile-make-clean
                                     "Makefile"))
 
 ;;;###autoload
@@ -115,20 +147,24 @@ otherwise 'build' is called."
     (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
         (if (member "Makefile" (directory-files path))
-              (if (member outfile (directory-files path))
-                  (basic-c-compile--with-makefile "rebuild")
-                (basic-c-compile--with-makefile "build"))
+            (if (member outfile (directory-files path))
+                (basic-c-compile--with-makefile "rebuild")
+              (basic-c-compile--with-makefile "build"))
           (progn (basic-c-compile--create-makefile basic-c-compile-compiler
-                                            (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                               (file-name-nondirectory (buffer-file-name)))
-                                            infile
-                                            basic-c-compile-compiler-flags
-                                            "Makefile")
-          (basic-c-compile--with-makefile "build")))
+                                                   (basic-c-compile--files-to-compile basic-c-compile-all-files
+                                                                                      (file-name-nondirectory (buffer-file-name)))
+                                                   infile
+                                                   basic-c-compile-outfile-extension
+                                                   basic-c-compile-compiler-flags
+                                                   basic-c-compile-make-clean
+                                                   "Makefile")
+                 (basic-c-compile--with-makefile "build")))
       (basic-c-compile--sans-makefile basic-c-compile-compiler
+                                      basic-c-compile-compiler-flags
                                       (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                          (file-name-nondirectory (buffer-file-name)))
-                                      infile))))
+                                      infile
+                                      basic-c-compile-outfile-extension))))
 
 ;;;###autoload
 (defun basic-c-compile-run-c ()
@@ -138,11 +174,12 @@ If the C source file is new than the binary file and
 compiled before it is run."
   (interactive)
   (when (not (file-newer-than-file-p (buffer-file-name)
-                                   (concat (file-name-nondirectory (buffer-file-name))
-                                           ".o")))
+                                     (concat (file-name-nondirectory (buffer-file-name))
+                                             ".o")))
     (when basic-c-compile-auto-comp
       (basic-c-compile-file)))
-      (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))))
+  (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))
+                               basic-c-compile-outfile-extension))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -175,22 +212,28 @@ purposes)."
                             (cl-remove-if-not #'basic-c-compile--c-file-extension-p
                                               (directory-files (file-name-directory file))))
                     " "))
-         (;; Call function that allows input of files to be compiled
-          (equal var-files-to-compile "selection")
-          (if str-files-to-compile
-              str-files-to-compile
-            (basic-c-compile--choose-files)))
-         (;; Default to only compiling the current file
-          t file)))
+        (;; Call function that allows input of files to be compiled
+         (equal var-files-to-compile "selection")
+         (if str-files-to-compile
+             str-files-to-compile
+           (basic-c-compile--choose-files)))
+        (;; Default to only compiling the current file
+         t file)))
 
 (defun basic-c-compile--sans-makefile (compiler
+                                       flags
                                        files-to-compile
-                                       file)
-  "Use COMPILER without a Makefile to compile FILES-TO-COMPILE as the name of current FILE."
-        (compile (format "%s -Wall %s -o %s.o"
-                         compiler
-                         files-to-compile
-                         (shell-quote-argument (file-name-sans-extension file)))))
+                                       file
+                                       extension)
+  "Use COMPILER with flags FLAGS and without a Makefile to compile FILES-TO-COMPILE as the name of current FILE with extension EXTENSION."
+  (compile (format "%s %s %s -o %s%s"
+                   compiler
+                   flags
+                   files-to-compile
+                   (shell-quote-argument (file-name-sans-extension file))
+                   (if extension
+                       (format ".%s" extension)
+                     ""))))
 
 (defun basic-c-compile--with-makefile (arg)
   "Compile file using the Makefile with specified ARG (build, clean or rebuild)."
@@ -200,33 +243,43 @@ purposes)."
 (defun basic-c-compile--create-makefile (compiler
                                          files-to-compile
                                          file
+                                         extension
                                          compiler-flags
+                                         clean
                                          makefile)
   "Create makefile of rules for compiler COMPILER on FILES-TO-COMPILE.
-Out-file will have name FILE.o compiled with
-flags COMPILER-FLAGS and makefile will be written to MAKEFILE."
+Out-file will have name FILE.EXTENSION compiled with flags
+COMPILER-FLAGS and makefile with clean command CLEAN will be
+written to MAKEFILE."
   (let ((makefile-contents
          (format (concat "CC = %s\n"
                          "INFILE = %s\n"
-                         "OUTFILE = %s.o\n"
+                         "OUTFILE = %s%s\n"
                          "FLAGS = %s\n\n"
                          "build: $(INFILE)\n\t"
                          "$(CC) $(FLAGS) $(INFILE)  -o $(OUTFILE)\n\n"
-                         "clean:\n\t rm -f *.o \n\n"
+                         "clean:\n\t%s\n\n"
                          "rebuild: clean build")
                  compiler
                  files-to-compile
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file)))
-                 compiler-flags)))
+                 (if extension
+                     (format ".%s" extension)
+                   "")
+                 compiler-flags
+                 clean)))
     (write-region makefile-contents
                   nil
                   makefile)))
 
 
-(defun basic-c-compile--run-c-file (file)
-  "Run FILE with the output printing in a temporary buffer."
-  (compile (format "./%s.o"
-                   (shell-quote-argument (file-name-sans-extension file)))))
+(defun basic-c-compile--run-c-file (file extension)
+  "Run FILE.EXTENSION with the output printing in a temporary buffer."
+  (compile (format "./%s%s"
+                   (shell-quote-argument (file-name-sans-extension file))
+                   (if extension
+                       (format ".%s" extension)
+                     ""))))
 
 
 (provide 'basic-c-compile)

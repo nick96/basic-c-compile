@@ -40,14 +40,18 @@ This package allows three commands to be called: =basic-c-compile-file=,
 
 ** basic-c-compile-file
 
-This command initially checks if you want to compile
-with or without a Makefile (just press 'y' or 'n').  If you press 'y',
-it will check for a Makefile in the file's directory. If there is one
-present, it will check for of the form =<file-name>.o=. Upon finding
-one, the package will run the command =make rebuild=. This assumes the
-Makefile is structured as expected. If no file is found, then =make
-build= will be run. If you choose to run without a Makefile,
-=gcc -Wall -o  <file-name>.c <file-name>.o= will be run.
+This command initially checks if you want to compile with or without a
+Makefile (just press 'y' or 'n').  If you press 'y', it will check for
+a Makefile in the file's directory. If there is one present, it will
+check for of the form =<file-name>.o=. Upon finding one, the package
+will run the command =make rebuild=. This assumes the Makefile is
+structured as expected. If no file is found, then =make build= will be
+run. If you choose to run without a Makefile,
+=<compiler> <flags> -o <file-name>.<extension> <file-name>.c= will be run.
+
+<compiler> =  =basic-c-compiler-compiler=
+<flags> = =basic-c-compile-compiler-flags=
+<extension> = =basic-c-compiler-outfile-extension=
 
 ** basic-c-compile-makefile
 
@@ -62,7 +66,8 @@ file will be included.
 
 ** basic-c-compile-run-c
 
-This command runs the output file =<file-name>.o= with =./<file-name>.o=.
+This command runs the output file =<file-name>.<extension= with
+=./<file-name>.<extension>=.
 
 ** Settings
 
@@ -82,6 +87,16 @@ All customisable setting can be found in the customisation menu
    true, then when =basic-c-compile-run-c= is called, it will check if
    the file's binary is up to date. If it isn't, then
    =basic-c-compile-file= will be called.
+5. =basic-c-compile-outfile-extension=: This is a string or nil which
+   sets the extension for compiled files. By default it is ".o" to all
+   =basic-c-compile-make-clean= to work without any changes, however,
+   the compiled file normally has no extension. To change it to this
+   just set the variable to nil. If you change this variable, you must
+   also change =basic-c-compile-make-clean=.
+6. =basic-c-compile-make-clean=: This is a string which is put in the
+   Makefile and called from the command line with =make clean=. By
+   default it is "rm -f *.o" but you can change it to whatever suits
+   you.
 
 
 ** Example usage
@@ -93,29 +108,19 @@ file I have:
   (require basic-c-compile)
   (setq basic-c-compiler "gcc-6"
         basic-c-compile-all-files nil
-        basic-c-compile-compiler-flags "-Wall -Werror -std=c11")
+        basic-c-compile-compiler-flags "-Wall -Werror -std=c11"
+        basic-c-compile-outfile-extension nil
+        basic-c-compile-make-clean "gfind . -type f -executable -delete")
+#+END_SRC
+
+*NOTE:* =gfind= is part of GNU findutils. I downloaded it using with:
+#+BEGIN_SRC shell
+  brew install findutilsp
 #+END_SRC
 
 I leave the =basic-c-compile-auto-comp= option as its default (t)
 because that's what works best for me but you're more than welcome to
 change it.
-
-I've also defined a function =basic-c-compile-debug-compile= (see
-below) in my init that adds the ~-g~ flag to
-=basic-c-compile-compiler-flags= then calls =basic-c-compile=. Once
-the call is finished, it switches =basic-c-compile-compiler-flags=
-back to it's original value.
-
-#+BEGIN_SRC emacs-lisp
-  (defun basic-c-compile-debug-compile ()
-    "Call basic-c-compile-file but with compile -g flag for debugging."
-    (interactive)
-    (let ((tmp basic-c-compile-compiler-flags))
-      (setq basic-c-compile-compiler-flags (concat basic-c-compile-compiler-flags
-                                                   "-g"))
-      (basic-c-compile-file)
-      (setq basic-c-compile-compiler-flags)))
-#+END_SRC
 
 The main issue I find with this workflow is for programs that require
 file redirection because the e-shell doesn't support this. Basically,
