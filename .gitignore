@@ -1,4 +1,3 @@
-*.org
 *.elc
 .projectile
 .dir-locals.el
