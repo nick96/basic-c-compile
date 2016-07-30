@@ -115,7 +115,7 @@ file I have:
 
 *NOTE:* =gfind= is part of GNU findutils. I downloaded it using with:
 #+BEGIN_SRC shell
-  brew install findutilsp
+  brew install findutils
 #+END_SRC
 
 I leave the =basic-c-compile-auto-comp= option as its default (t)
