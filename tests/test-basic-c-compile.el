@@ -6,10 +6,9 @@
 ;; Maintainer:
 ;; Created: Fri Jul 29 22:11:40 2016 (+1000)
 ;; Version:
-;; Package-Requires: ()
 ;; Last-Updated:
 ;;           By:
-;;     Update #: 0
+;;     Update #: 1
 ;; URL:
 ;; Doc URL:
 ;; Keywords:
@@ -24,6 +23,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Change Log:
+;; 30-Jul-2016 Nick Spain
+;;    Initial commit. Add tests for basic-c-compile--files-to-compile
+;;    and basic-c-compile--c-file-extension-p.
 ;;
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
