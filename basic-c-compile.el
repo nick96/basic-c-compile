@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.5.1
+;; Version: 1.5.2
 ;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -35,6 +35,12 @@
 ;; file.
 
 ;;; Change log:
+;; 1-Aug-2016    Nick Spain
+;;
+;;    BUG FIX: basic-c-compile-run-c now checks for an outfile with
+;;    the extension set by basic-c-compile-outfile-extension.
+;;    Previously it was only checking for files with extension '.o'
+;;
 ;; 30-Jul-2016    Nick Spain
 ;;
 ;;    Add basic-c-compile-outfile-extension and
@@ -106,7 +112,7 @@ so means you will have to change this variable as well."
   :options '("find . -type f -executable -delete"
              "gfind . -type f -executable -delete"))
 
-
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Interactive functions
@@ -173,14 +179,21 @@ If the C source file is new than the binary file and
 `basic-c-compile-auto-comp' is true, then the file will be
 compiled before it is run."
   (interactive)
+  (let ((outfile (if basic-c-compile-outfile-extension
+                     (concat (file-name-sans-extension
+                              (file-name-nondirectory (buffer-file-name)))
+                             "."
+                             basic-c-compile-outfile-extension)
+                   (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))))
   (when (not (file-newer-than-file-p (buffer-file-name)
-                                     (concat (file-name-nondirectory (buffer-file-name))
-                                             ".o")))
+                                     outfile))
+    (basic-c-compile-file))
     (when basic-c-compile-auto-comp
       (basic-c-compile-file)))
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))
                                basic-c-compile-outfile-extension))
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Non-interactive functions
