@@ -52,7 +52,6 @@
 
 
 
-;; Test basic-c-compile--c-file-extension-p
 (describe "Function: basic-c-compile--c-file-extension-p"
   (it "Returns true if the file ends in a '.c' extension"
     ;; True testing
@@ -70,7 +69,6 @@
 
 
 
-;; Test basic-c-compile--files-to-compile
 (describe "Function: basic-c-compile--files-to-compile"
     ;; Set-up
     (before-all

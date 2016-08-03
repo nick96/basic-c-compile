@@ -77,22 +77,27 @@ All customisable setting can be found in the customisation menu
 
 1. =basic-c-compile-compiler=: This chooses the compiler that is used
    to compile the file(s). By default it is "gcc".
+
 2. =basic-c-compile-all-files=: This is explained above but just
    quickly, it allows you to choose which files are compiled. By
    default it is "all".
+
 3. =basic-c-compile-compiler-flags=: This is one string containing all
    flags files are compiled with. By default it is "-Wall".
+
 4. =basic-c-compiler-auto-comp=: This is a boolean variable defining
    whether or not out of date binary files are compiled. If it is
    true, then when =basic-c-compile-run-c= is called, it will check if
    the file's binary is up to date. If it isn't, then
    =basic-c-compile-file= will be called.
+
 5. =basic-c-compile-outfile-extension=: This is a string or nil which
    sets the extension for compiled files. By default it is ".o" to all
    =basic-c-compile-make-clean= to work without any changes, however,
    the compiled file normally has no extension. To change it to this
    just set the variable to nil. If you change this variable, you must
    also change =basic-c-compile-make-clean=.
+
 6. =basic-c-compile-make-clean=: This is a string which is put in the
    Makefile and called from the command line with =make clean=. By
    default it is "rm -f *.o" but you can change it to whatever suits

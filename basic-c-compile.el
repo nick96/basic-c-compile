@@ -23,23 +23,38 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.5.2
+;; Version: 1.5.5
 ;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
 
 ;;; Commentary:
 
-;; basic-c-compile.el is a basic script for C programming.  It can create a basic
-;; Makefile, compile the C program (with or without the Makefile) and run the
-;; file.
+;; basic-c-compile aims to augment your C programming workflow.  It
+;; provides commands to create a Makefile, compile file(s) and run
+;; file(s).  The specifics of many of these commands can be changed
+;; using the customisable variables for this package.  They are all
+;; described in README.org.
+
+;;; Bugs:
+;; Compilation hangs if basic-c-compile-run-c is called and it find
+;; that the outfile is out of date.
 
 ;;; Change log:
+;; 3-Aug-2016    Nick Spain
+;;
+;;    BUG FIX: compiling without Makefile mean that the full path of
+;;    the outfile was included. This is messy and unnecessary so I
+;;    removed it.
+;;
 ;; 1-Aug-2016    Nick Spain
 ;;
 ;;    BUG FIX: basic-c-compile-run-c now checks for an outfile with
 ;;    the extension set by basic-c-compile-outfile-extension.
-;;    Previously it was only checking for files with extension '.o'
+;;    Previously it was only checking for files with extension '.o'. A
+;;    message letting the use know that the file has been update is
+;;    now print as well.
+;;    Change commentary.
 ;;
 ;; 30-Jul-2016    Nick Spain
 ;;
@@ -119,7 +134,7 @@ so means you will have to change this variable as well."
 
 ;;;###autoload
 (defun basic-c-compile-makefile ()
-  "Create a Makefile of the form shown in README.
+  "Create a Makefile of the form shown in README.org.
 This function uses the variables `basic-c-compile-compiler',
 `basic-c-compile-all-files' and `basic-c-compile-compiler-flags'.
 It uses `basic-c-compile--files-to-compile' in conjunction with
@@ -145,11 +160,16 @@ in the directory then one is make using
 check for, if there is not one then 'rebuild' is called,
 otherwise 'build' is called."
   (interactive)
-  ;; Define local scope variables
   (let* ((path (file-name-directory (buffer-file-name)))
-         (infile (buffer-file-name))
-         (outfile (concat (file-name-sans-extension infile) ".o")))
-    ;; Makefile control flow
+         (infile (file-name-nondirectory (buffer-file-name)))
+         (outfile (concat (file-name-nondirectory
+                           (file-name-sans-extension infile))
+                          ;; Outfile extension depends on -outfile-extension
+                          (if basic-c-compile-outfile-extension
+                              (format ".%s"
+                                      basic-c-compile-outfile-extension)
+                            ""))))
+
     (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
         (if (member "Makefile" (directory-files path))
@@ -184,12 +204,15 @@ compiled before it is run."
                               (file-name-nondirectory (buffer-file-name)))
                              "."
                              basic-c-compile-outfile-extension)
-                   (file-name-sans-extension (file-name-nondirectory (buffer-file-name))))))
-  (when (not (file-newer-than-file-p (buffer-file-name)
-                                     outfile))
-    (basic-c-compile-file))
-    (when basic-c-compile-auto-comp
-      (basic-c-compile-file)))
+                   (file-name-sans-extension (file-name-nondirectory
+                                              (buffer-file-name))))))
+  (when (and (file-newer-than-file-p (buffer-file-name)
+                                          outfile)
+             basic-c-compile-auto-comp)
+    (message "Basic-c-compile updated %s to be current with %s."
+             outfile
+             (file-name-nondirectory (buffer-file-name)))
+    (basic-c-compile-file)))
   (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))
                                basic-c-compile-outfile-extension))
 
@@ -222,8 +245,9 @@ purposes)."
          (equal var-files-to-compile "all")
          (mapconcat 'identity
                     (mapcar #'shell-quote-argument
-                            (cl-remove-if-not #'basic-c-compile--c-file-extension-p
-                                              (directory-files (file-name-directory file))))
+                            (mapcar #'file-name-nondirectory
+                                    (cl-remove-if-not #'basic-c-compile--c-file-extension-p
+                                                      (directory-files (file-name-directory file)))))
                     " "))
         (;; Call function that allows input of files to be compiled
          (equal var-files-to-compile "selection")
