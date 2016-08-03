@@ -23,7 +23,7 @@
 ;; SOFTWARE.
 
 ;; Author: Nick Spain <nicholas.spain96@gmail.com>
-;; Version: 1.5.5
+;; Version: 1.5.7
 ;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
 ;; Package-Requires: ((cl-lib "0.5"))
@@ -35,10 +35,13 @@
 ;; file(s).  The specifics of many of these commands can be changed
 ;; using the customisable variables for this package.  They are all
 ;; described in README.org.
+;;
+;; Basic setup:
+;; Add (require 'basic-c-compile) to you init file.
 
 ;;; Bugs:
 ;; Compilation hangs if basic-c-compile-run-c is called and it find
-;; that the outfile is out of date.
+;; that the outfile is out of date.  Press enter to get passed this.
 
 ;;; Change log:
 ;; 3-Aug-2016    Nick Spain
@@ -65,7 +68,7 @@
 ;; 29-Jul-2016 Nick Spain
 ;;
 ;;    Add option basic-c-compile-auto-comp, this gives basic-c-compile
-;;    the ability to automatically compile out of date binaries before
+;;    the ability to automatically compile out of date outfiles before
 ;;    run time.
 ;;    Update doc-strings.
 
@@ -76,6 +79,7 @@
 
 ;; User customisation
 ;; These can be changed by the user in their init file
+;; or using the customisation menu.
 
 (defgroup basic-c-compile nil
   "Quickly create a makefile, compile and run your C program."
@@ -84,39 +88,59 @@
 
 
 (defcustom basic-c-compile-compiler "gcc"
-  "Compiler used to by basic-c-compile to compile file(s)."
+  "Compiler used to compile file(s).
+
+This variable is used by `basic-c-compile-file' to tell
+`basic-c-compile--sans-makefile' and
+`basic-c-compile--create-makefile' which compiler to use."
   :group 'basic-c-compile
+  :type 'string
   :options '("clang"))
 
 (defcustom basic-c-compile-all-files "all"
   "Changes the selection of files compiled.
 'all' will compile all files in directory.  'selection' will give
 you a prompt to list the file.  Any other setting will only
-compile the current file."
+compile the current file.
+
+This variable is used by `basic-c-compile--files-to-compile' to
+return a string of the file(s) to be compiled."
   :group 'basic-c-compile
+  :type 'string
   :options '("all" "selection" nil))
 
 (defcustom basic-c-compile-compiler-flags "-Wall"
-  "String of flags for compiler."
+  "String of flags for compiler.
+
+This variable is used by `basic-c-compile-file' to tell
+`basic-c-compile--sans-makefile' and
+`basic-c-compile--create-makefile' what flags to give the
+compiler."
   :group 'basic-c-compile
+  :type 'string
   :options '("-Wall -Werror"))
 
 (defcustom basic-c-compile-auto-comp t
-  "Boolean option for automatically compiling out of date binary files.
-This variable is check when `basic-c-compile-run-c' is called.  If it is true
-then the source file(s) are recompiled."
+  "Boolean option for automatically compiling out of date outfiles.
+
+This variable is checked when `basic-c-compile-run-c' is called.
+If it is true then the source file(s) are recompiled."
   :group 'basic-c-compile
+  :type 'boolean
   :options '(nil))
 
 (defcustom basic-c-compile-outfile-extension "o"
   "String of extension to put onto the end of the outfile.
+
 This variable is 'o' by default.  If you do change this variable
 then you must also change `basic-c-compile-make-clean'."
   :group 'basic-c-compile
+  :type 'string
   :options '(nil "a"))
 
 (defcustom basic-c-compile-make-clean "rm -f *.o"
   "String of line or lines to put in Makefile's clean section.
+
 This option is set to 'rm -f *.o' because by default the
 `basic-c-compile-outfile-extension' is set to 'o'.  This makes it
 easier to just have general command to remove the
@@ -124,6 +148,7 @@ outfile.  However, the convention is to have no extension.  Do
 this by setting `basic-c-compile-outfile-extension' to nil.  Doing
 so means you will have to change this variable as well."
   :group 'basic-c-compile
+  :type 'string
   :options '("find . -type f -executable -delete"
              "gfind . -type f -executable -delete"))
 
@@ -156,7 +181,7 @@ Makefile's INFILE."
 A y-or-n prompt is called to determine if you want to use the
 Makefile of not.  If you say yes ('y') and there is no Makefile
 in the directory then one is make using
-`basic-c-compile--makefile'.  The presence of a binary file is
+`basic-c-compile--makefile'.  The presence of a outfile is
 check for, if there is not one then 'rebuild' is called,
 otherwise 'build' is called."
   (interactive)
@@ -195,26 +220,26 @@ otherwise 'build' is called."
 ;;;###autoload
 (defun basic-c-compile-run-c ()
   "Run the program.
-If the C source file is new than the binary file and
+If the C source file is new than the outfile and
 `basic-c-compile-auto-comp' is true, then the file will be
 compiled before it is run."
   (interactive)
-  (let ((outfile (if basic-c-compile-outfile-extension
-                     (concat (file-name-sans-extension
-                              (file-name-nondirectory (buffer-file-name)))
+  (let* ((infile (file-name-nondirectory (buffer-file-name)))
+        (outfile (if basic-c-compile-outfile-extension
+                     (concat (file-name-sans-extension infile)
                              "."
                              basic-c-compile-outfile-extension)
                    (file-name-sans-extension (file-name-nondirectory
                                               (buffer-file-name))))))
-  (when (and (file-newer-than-file-p (buffer-file-name)
-                                          outfile)
+  (when (and (file-newer-than-file-p infile
+                                     outfile)
              basic-c-compile-auto-comp)
     (message "Basic-c-compile updated %s to be current with %s."
              outfile
-             (file-name-nondirectory (buffer-file-name)))
-    (basic-c-compile-file)))
-  (basic-c-compile--run-c-file (file-name-nondirectory (buffer-file-name))
-                               basic-c-compile-outfile-extension))
+             infile)
+    (basic-c-compile-file))
+  (basic-c-compile--run-c-file infile
+                               basic-c-compile-outfile-extension)))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

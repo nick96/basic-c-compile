@@ -3,7 +3,6 @@
 #+OPTIONS: email:nil f:t inline:t num:nil p:nil pri:nil prop:nil stat:t
 #+OPTIONS: tags:t tasks:t tex:t timestamp:t title:t toc:nil todo:t |:t
 #+TITLE: Basic C compile
-#+DATE: <2016-07-30 Sat>
 #+AUTHOR: Nick Spain
 #+EMAIL: nicholas.spain96@gmail.com
 #+LANGUAGE: en
@@ -130,3 +129,9 @@ change it.
 The main issue I find with this workflow is for programs that require
 file redirection because the e-shell doesn't support this. Basically,
 that's the only time that I switch to a shell outside of Emacs.
+
+* Issues
+
+Currently when you run =basic-c-compile-run-c= it hangs after
+=basic-c-compile-file=. To get passed this just press enter and it
+will continue. I am trying to sort this out though.
