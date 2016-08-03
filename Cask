@@ -2,7 +2,7 @@
 (source melpa)
 
 (package "basic-c-compile"
-         "1.5.5"
+         "1.5.7"
          "Quickly create a basic Makefile, compile and run a C program.")
 
 (package-file "basic-c-compile.el")
