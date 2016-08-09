@@ -1,4 +1,4 @@
-;;; basic-c-compile.el --- Quickly create a basic Makefile, compile and run a C program.
+;;; basic-c-compile.el --- Quickly create a Makefile, compile and run C.
 
 ;; The MIT License (MIT)
 
@@ -72,6 +72,10 @@
 ;;    run time.
 ;;    Update doc-strings.
 
+;; TODO: Update README so that it acknowledges the variablility of
+;; file extensions
+
+;; TODO: Add tests and badges
 
 ;;; Code:
 
@@ -168,7 +172,7 @@ Makefile's INFILE."
   (interactive)
   (basic-c-compile--create-makefile basic-c-compile-compiler
                                     (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                       (file-name-nondirectory (buffer-file-name)))
+                                                                       (buffer-file-name))
                                     (buffer-file-name)
                                     basic-c-compile-outfile-extension
                                     basic-c-compile-compiler-flags
@@ -323,7 +327,9 @@ written to MAKEFILE."
                          "clean:\n\t%s\n\n"
                          "rebuild: clean build")
                  compiler
-                 files-to-compile
+                 (if (listp files-to-compile)
+                     (mapcar #'file-name-nondirectory files-to-compile)
+                   (file-name-nondirectory files-to-compile))
                  (shell-quote-argument (file-name-nondirectory (file-name-sans-extension file)))
                  (if extension
                      (format ".%s" extension)

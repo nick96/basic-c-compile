@@ -1,0 +1,69 @@
+
+basic-c-compile.el,788
+(defgroup basic-c-compile 59,2160
+(defcustom basic-c-compile-compiler 65,2301
+(defcustom basic-c-compile-all-files 70,2453
+(defcustom basic-c-compile-compiler-flags 78,2757
+(defcustom basic-c-compile-auto-comp 83,2899
+(defcustom basic-c-compile-outfile-extension 90,3175
+(defcustom basic-c-compile-make-clean 97,3455
+(defun basic-c-compile-makefile 115,4183
+(defun basic-c-compile-file 133,5147
+(defun basic-c-compile-run-c 170,7351
+(defun basic-c-compile--choose-files 189,8159
+(defun basic-c-compile--c-file-extension-p 195,8362
+(defun basic-c-compile--files-to-compile 200,8544
+(defun basic-c-compile--sans-makefile 223,9698
+(defun basic-c-compile--with-makefile 238,10391
+(defun basic-c-compile--create-makefile 243,10573
+(defun basic-c-compile--run-c-file 276,11953
+
+README.org,0
+
+Cask,0
+
+basic-c-compile.el,793
+(defgroup basic-c-compile 80,2946
+(defcustom basic-c-compile-compiler 86,3087
+(defcustom basic-c-compile-all-files 91,3239
+(defcustom basic-c-compile-compiler-flags 99,3543
+(defcustom basic-c-compile-auto-comp 104,3685
+(defcustom basic-c-compile-outfile-extension 111,3961
+(defcustom basic-c-compile-make-clean 118,4241
+(defun basic-c-compile-makefile 136,4970
+(defun basic-c-compile-file 154,5938
+(defun basic-c-compile-run-c 196,8442
+(defun basic-c-compile--choose-files 225,9728
+(defun basic-c-compile--c-file-extension-p 231,9931
+(defun basic-c-compile--files-to-compile 236,10113
+(defun basic-c-compile--sans-makefile 260,11345
+(defun basic-c-compile--with-makefile 275,12038
+(defun basic-c-compile--create-makefile 280,12220
+(defun basic-c-compile--run-c-file 313,13600
+
+README.org,0
+
+Cask,0
+
+basic-c-compile.el,797
+(defgroup basic-c-compile 84,3053
+(defcustom basic-c-compile-compiler 90,3194
+(defcustom basic-c-compile-all-files 100,3492
+(defcustom basic-c-compile-compiler-flags 112,3924
+(defcustom basic-c-compile-auto-comp 123,4244
+(defcustom basic-c-compile-outfile-extension 132,4535
+(defcustom basic-c-compile-make-clean 141,4832
+(defun basic-c-compile-makefile 161,5578
+(defun basic-c-compile-file 179,6546
+(defun basic-c-compile-run-c 221,9046
+(defun basic-c-compile--choose-files 250,10232
+(defun basic-c-compile--c-file-extension-p 256,10435
+(defun basic-c-compile--files-to-compile 261,10617
+(defun basic-c-compile--sans-makefile 285,11849
+(defun basic-c-compile--with-makefile 300,12542
+(defun basic-c-compile--create-makefile 305,12724
+(defun basic-c-compile--run-c-file 338,14104
+
+README.org,0
+
+Cask,0
