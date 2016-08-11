@@ -67,3 +67,58 @@ basic-c-compile.el,797
 README.org,0
 
 Cask,0
+
+Makefile,132
+CASK ?=CASK ?1,0
+EMACS ?=EMACS ?2,13
+all:all4,29
+test:test6,40
+unit:unit8,59
+ecukes:ecukes11,91
+install:install14,121
+
+basic-c-compile.el,797
+(defgroup basic-c-compile 88,3187
+(defcustom basic-c-compile-compiler 94,3328
+(defcustom basic-c-compile-all-files 104,3626
+(defcustom basic-c-compile-compiler-flags 116,4058
+(defcustom basic-c-compile-auto-comp 127,4378
+(defcustom basic-c-compile-outfile-extension 136,4669
+(defcustom basic-c-compile-make-clean 145,4966
+(defun basic-c-compile-makefile 165,5712
+(defun basic-c-compile-file 183,6655
+(defun basic-c-compile-run-c 229,9264
+(defun basic-c-compile--choose-files 258,10450
+(defun basic-c-compile--c-file-extension-p 264,10653
+(defun basic-c-compile--files-to-compile 269,10835
+(defun basic-c-compile--sans-makefile 293,12067
+(defun basic-c-compile--with-makefile 308,12760
+(defun basic-c-compile--create-makefile 313,12942
+(defun basic-c-compile--run-c-file 348,14468
+
+README.org,0
+
+Cask,0
+
+basic-c-compile.el,797
+(defgroup basic-c-compile 88,3187
+(defcustom basic-c-compile-compiler 94,3328
+(defcustom basic-c-compile-all-files 104,3626
+(defcustom basic-c-compile-compiler-flags 116,4058
+(defcustom basic-c-compile-auto-comp 127,4378
+(defcustom basic-c-compile-outfile-extension 136,4669
+(defcustom basic-c-compile-make-clean 145,4966
+(defun basic-c-compile-makefile 165,5712
+(defun basic-c-compile-file 183,6655
+(defun basic-c-compile-run-c 229,9239
+(defun basic-c-compile--choose-files 258,10425
+(defun basic-c-compile--c-file-extension-p 264,10628
+(defun basic-c-compile--files-to-compile 269,10810
+(defun basic-c-compile--sans-makefile 293,12042
+(defun basic-c-compile--with-makefile 308,12735
+(defun basic-c-compile--create-makefile 313,12917
+(defun basic-c-compile--run-c-file 348,14443
+
+README.org,0
+
+Cask,0

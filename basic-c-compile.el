@@ -202,10 +202,13 @@ otherwise 'build' is called."
     (if (y-or-n-p "Compile with Makefile? ")
         ;; Check for presence of Makefile to stop creating duplicates
         (if (member "Makefile" (directory-files path))
+            ;; Does this need to be more general for multi-file cases
             (if (member outfile (directory-files path))
                 (basic-c-compile--with-makefile "rebuild")
+              ;; else
               (basic-c-compile--with-makefile "build"))
-          (progn (basic-c-compile--create-makefile basic-c-compile-compiler
+          ;; else
+          (basic-c-compile--create-makefile basic-c-compile-compiler
                                                    (basic-c-compile--files-to-compile basic-c-compile-all-files
                                                                                       (file-name-nondirectory (buffer-file-name)))
                                                    infile
@@ -213,11 +216,12 @@ otherwise 'build' is called."
                                                    basic-c-compile-compiler-flags
                                                    basic-c-compile-make-clean
                                                    "Makefile")
-                 (basic-c-compile--with-makefile "build")))
+          (basic-c-compile--with-makefile "build"))
+      ;; else
       (basic-c-compile--sans-makefile basic-c-compile-compiler
                                       basic-c-compile-compiler-flags
                                       (basic-c-compile--files-to-compile basic-c-compile-all-files
-                                                                         (file-name-nondirectory (buffer-file-name)))
+                                                                         (buffer-file-name))
                                       infile
                                       basic-c-compile-outfile-extension))))
 
