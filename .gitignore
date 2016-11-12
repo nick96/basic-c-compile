@@ -3,3 +3,4 @@
 .dir-locals.el
 dist/
 .cask/
+*.html
