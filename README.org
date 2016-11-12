@@ -17,7 +17,7 @@
 # [[https://gitter.im/nick96/basic-c-compile][file:https://badges.gitter.im/Join%20Chat.svg]]
 
 [[http://melpa.org/#/basic-c-compile][file:http://melpa.org/packages/basic-c-compile-badge.svg]]
-[[http://www.gnu.org/licenses/gpl-3.0.html][file:http://img.shields.io/:license-gpl3-blue.svg]]
+[[https://badges.mit-license.org/][file:https://img.shields.io/github/license/mashape/apistatus.svg]]
 
 This is a script for the basic actions involved in compiling and
 running a C file.  It will be able to create a basic Makefile of the
