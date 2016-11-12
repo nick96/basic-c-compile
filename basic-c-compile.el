@@ -104,7 +104,7 @@ If it is true then the source file(s) are recompiled."
   "String of extension to put onto the end of the outfile.
 
 This variable is 'o' by default.  If you do change this variable
-then you must also change `basic-c-compile-make-clean'."
+hen you must also change `basic-c-compile-make-clean'."
   :group 'basic-c-compile
   :type 'string
   :options '(nil "a"))

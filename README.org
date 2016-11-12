@@ -81,14 +81,14 @@ customize-variable=). They are in the group =basic-c-compile= which is
 in the =tools= section. You can also change them in your init file
 with: =(setq <variable-name> <variable-value>)=.
 
-| Variable                            | Description                                                   | Default |
-|-------------------------------------+---------------------------------------------------------------+---------|
-| =basic-c-compile-compiler=          | Set compiler                                                  | "gcc"   |
-| =basic-c-compile-all-files=         | Choose the set of files compiled                              | "all"   |
-| =basic-c-compiler-flags=            | String of the flags used by the compiler                      | "-Wall" |
-| =basic-c-coomile-auto-comp=         | Boolean defining wherer or not to update out-of-date outfiles | t       |
-| =basic-c-compile-outfile-extension= | String or nil setting the extension added to the outfile      | ".o"    |
-| =basic-c-compile-make-clean=        | Command run for =make clean=                                  |         |
+| Variable                            | Description                                                   | Default     |
+|-------------------------------------+---------------------------------------------------------------+-------------|
+| =basic-c-compile-compiler=          | Set compiler                                                  | "gcc"       |
+| =basic-c-compile-all-files=         | Choose the set of files compiled                              | "all"       |
+| =basic-c-compiler-flags=            | String of the flags used by the compiler                      | "-Wall"     |
+| =basic-c-coomile-auto-comp=         | Boolean defining wherer or not to update out-of-date outfiles | t           |
+| =basic-c-compile-outfile-extension= | String or nil setting the extension added to the outfile      | ".o"        |
+| =basic-c-compile-make-clean=        | Command run for =make clean=                                  | "rm -f *.o" |
 
 
 ** Example usage
