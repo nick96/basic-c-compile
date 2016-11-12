@@ -1,0 +1,41 @@
+2016-11-13  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* ChangeLog: Create change log, merge changelog sections from
+	files into it.
+
+	* basic-c-compile.el: Fixed bug that meant compilation without
+	Makefile failed if file-path contained a space.
+
+
+2016-08-11  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* basic-c-compile: Fix basic-c-compile--sans-makefile to work when
+	basic-c-compile-all-files is set to all.
+
+
+2016-08-01  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* basic-c-compile.el: basic-c-compile-run-c now checks for an
+	outfile with the extension set by
+	basic-c-compile-outfile-extension.  Previously it was only
+	checking for files with extension '.o'. A message letting the use
+	know that the file has been update is now print as well.  Change
+	commentary.
+
+
+2016-07-30  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* basic-c-compile.el: Add basic-c-compile-outfile-extension and
+	basic-c-compile-make-clean, plus update commands that utilise
+	them. Update customisable variables to have options.
+
+	* test-basic-c-compile.el: Initial commit. Add tests for
+	basic-c-compile--files-to-compile and
+	basic-c-compile--c-file-extenson-p.
+
+
+2016-07-29  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* basic-c-compile.el: Add option basic-c-compile-auto-comp, this
+	gives basic-c-compile the ability to automatically compile out of
+	date outfiles before run time.  Update doc-strings.

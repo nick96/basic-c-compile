@@ -14,5 +14,7 @@
 
 (development
  (depends-on "buttercup")
+ (depends-on "ert")
  (depends-on "cask-package-toolset")
+ (depends-on "ecukes")
  )

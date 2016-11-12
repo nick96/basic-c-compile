@@ -10,8 +10,14 @@
 #+EXCLUDE_TAGS: noexport
 #+CREATOR: Emacs 24.5.1 (Org mode 8.3.4)
 
-This is my first Emacs package so any and all constructive criticism
-is appreciated.
+# [[https://travis-ci.org/nick96/basic-c-compile][file:https://travis-ci.org/nick96/basic-c-compile.svg]]
+# [[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
+# [[http://stable.melpa.org/#/basic-c-compile][file:http://stable.melpa.org/packages/basic-c-compile-badge.svg]]
+# [[https://github.com/nick96/basic-c-compile/tags][file:https://img.shields.io/github/tag/nick96/basic-c-compile.svg]]
+# [[https://gitter.im/nick96/basic-c-compile][file:https://badges.gitter.im/Join%20Chat.svg]]
+
+[[http://melpa.org/#/basic-c-compile][file:http://melpa.org/packages/basic-c-compile-badge.svg]]
+[[http://www.gnu.org/licenses/gpl-3.0.html][file:http://img.shields.io/:license-gpl3-blue.svg]]
 
 This is a script for the basic actions involved in compiling and
 running a C file.  It will be able to create a basic Makefile of the
@@ -70,37 +76,19 @@ This command runs the output file =<file-name>.<extension= with
 
 ** Settings
 
-All customisable setting can be found in the customisation menu
-(=M-x customize-variable=). They are in the group =basic-c-compile= which is in the =tools= section. You can also change them in your init file with:
-=(setq <variable-name> <variable-value>)=.
+All customisable setting can be found in the customisation menu (=M-x
+customize-variable=). They are in the group =basic-c-compile= which is
+in the =tools= section. You can also change them in your init file
+with: =(setq <variable-name> <variable-value>)=.
 
-1. =basic-c-compile-compiler=: This chooses the compiler that is used
-   to compile the file(s). By default it is "gcc".
-
-2. =basic-c-compile-all-files=: This is explained above but just
-   quickly, it allows you to choose which files are compiled. By
-   default it is "all".
-
-3. =basic-c-compile-compiler-flags=: This is one string containing all
-   flags files are compiled with. By default it is "-Wall".
-
-4. =basic-c-compiler-auto-comp=: This is a boolean variable defining
-   whether or not out of date binary files are compiled. If it is
-   true, then when =basic-c-compile-run-c= is called, it will check if
-   the file's binary is up to date. If it isn't, then
-   =basic-c-compile-file= will be called.
-
-5. =basic-c-compile-outfile-extension=: This is a string or nil which
-   sets the extension for compiled files. By default it is ".o" to all
-   =basic-c-compile-make-clean= to work without any changes, however,
-   the compiled file normally has no extension. To change it to this
-   just set the variable to nil. If you change this variable, you must
-   also change =basic-c-compile-make-clean=.
-
-6. =basic-c-compile-make-clean=: This is a string which is put in the
-   Makefile and called from the command line with =make clean=. By
-   default it is "rm -f *.o" but you can change it to whatever suits
-   you.
+| Variable                            | Description                                                   | Default |
+|-------------------------------------+---------------------------------------------------------------+---------|
+| =basic-c-compile-compiler=          | Set compiler                                                  | "gcc"   |
+| =basic-c-compile-all-files=         | Choose the set of files compiled                              | "all"   |
+| =basic-c-compiler-flags=            | String of the flags used by the compiler                      | "-Wall" |
+| =basic-c-coomile-auto-comp=         | Boolean defining wherer or not to update out-of-date outfiles | t       |
+| =basic-c-compile-outfile-extension= | String or nil setting the extension added to the outfile      | ".o"    |
+| =basic-c-compile-make-clean=        | Command run for =make clean=                                  |         |
 
 
 ** Example usage
@@ -113,22 +101,12 @@ file I have:
   (setq basic-c-compiler "gcc-6"
         basic-c-compile-all-files nil
         basic-c-compile-compiler-flags "-Wall -Werror -std=c11"
-        basic-c-compile-outfile-extension nil
-        basic-c-compile-make-clean "gfind . -type f -executable -delete")
 #+END_SRC
-
-*NOTE:* =gfind= is part of GNU findutils. I downloaded it using with:
-#+BEGIN_SRC shell
-  brew install findutils
-#+END_SRC
-
-I leave the =basic-c-compile-auto-comp= option as its default (t)
-because that's what works best for me but you're more than welcome to
-change it.
 
 The main issue I find with this workflow is for programs that require
-file redirection because the e-shell doesn't support this. Basically,
-that's the only time that I switch to a shell outside of Emacs.
+file redirection because the eshell doesn't support this. Basically,
+that's the only time that I switch to a shell outside of
+Emacs. Currently, I am working on adding this facility.
 
 * Issues
 

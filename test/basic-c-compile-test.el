@@ -22,14 +22,6 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;;; Change Log:
-;; 30-Jul-2016 Nick Spain
-;;    Initial commit. Add tests for basic-c-compile--files-to-compile
-;;    and basic-c-compile--c-file-extension-p.
-;;
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation, either version 3 of the License, or (at
@@ -50,8 +42,6 @@
 (require 'basic-c-compile)
 (require 'buttercup)
 
-
-
 (describe "Function: basic-c-compile--c-file-extension-p"
   (it "Returns true if the file ends in a '.c' extension"
     ;; True testing
@@ -66,7 +56,6 @@
   (it "Throws an exception for blank strings"
     (expect (basic-c-compile--c-file-extension-p "")
             :to-throw)))
-
 
 
 (describe "Function: basic-c-compile--files-to-compile"
@@ -97,6 +86,22 @@
       (expect (basic-c-compile--files-to-compile nil
                                                  "test.c")
               :to-equal "test.c")))
+
+(defvar test-basic-c-compile-c-small-text
+  "int main () {return(0);}")
+
+(describe "Function: basic-c-compile--sans-makefile"
+          (before-all (shell-command "touch test.c")
+                      (shell-command (format "echo %s > test.c"
+                                             test-basic-c-compile-c-small-text)))
+          (after-all (delete-file "test.c"))
+          (it "Compiles test.c with no extension using clang"
+              (basic-c-compile--sans-makefile "clang"
+                                              "-Wall"
+                                              "test.c"
+                                              "test.c"
+                                              nil)))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
