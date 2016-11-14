@@ -13,8 +13,7 @@
 (depends-on "cl-lib" "0.5")
 
 (development
- (depends-on "buttercup")
  (depends-on "ert")
  (depends-on "cask-package-toolset")
- (depends-on "ecukes")
- )
+ (depends-on "el-mock")
+ (depends-on "ert-runner"))

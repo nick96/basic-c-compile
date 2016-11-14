@@ -1,108 +1,67 @@
-;;; test-basic-c-compile.el --- Testing of basic-c-compile with buttercup.
-;;
-;; Filename: buttercup-basic-c-compile.el
-;; Description:
-;; Author: Nick Spain
-;; Maintainer:
-;; Created: Fri Jul 29 22:11:40 2016 (+1000)
-;; Version:
-;; Last-Updated:
-;;           By:
-;;     Update #: 1
-;; URL:
-;; Doc URL:
-;; Keywords:
-;; Compatibility:
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
+;;; basic-c-compile-test.el --- Testing of basic-c-compile.
+
 ;;; Commentary:
-;;
-;;
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or (at
-;; your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
+;; Tests for package basic-c-compile.
 ;;; Code:
 
 (require 'basic-c-compile)
-(require 'buttercup)
+(require 'ert)
+(require 'test-helper)
+(require 'f)
+(require 's)
 
-(describe "Function: basic-c-compile--c-file-extension-p"
-  (it "Returns true if the file ends in a '.c' extension"
-    ;; True testing
-    (dolist (file '("test.c" "test.1.c" "test_test_test.c"))
-      (expect (basic-c-compile--c-file-extension-p file)
-              :to-be-truthy)))
-  (it "Returns false if the file does not end in a '.c' extension"
-    ;; False testing
-    (dolist (file '("test.pl" "test.py" "test.java" "test"))
-      (expect (basic-c-compile--c-file-extension-p file)
-              :not :to-be-truthy)))
-  (it "Throws an exception for blank strings"
-    (expect (basic-c-compile--c-file-extension-p "")
-            :to-throw)))
+(defvar c-hello-world (s-join "\n" '("#include <stdio.h>"
+				     "int main (int argc, char *argv[]) {"
+				     "    printf(\"Hello, World\\n\");"
+				     "}\\n")))
 
+(defvar makefile (s-join "\n" '("CC = gcc"
+				"INFILE = test.c"
+				"OUTFILE = test.o"
+				"FLAGS = -Wall"
+				"build: $(INFILE)"
+				"\t$(CC) $(FLAGS) $(INFILE) -o $(OUTFILE)\n"
+				"clean:"
+				"\trm -rf *.o\n"
+				"rebuild: clean build")))
 
-(describe "Function: basic-c-compile--files-to-compile"
-    ;; Set-up
-    (before-all
-      (mkdir "test/")
-      (dolist (file '("test/test.c" "test/test1.c" "test/test2.c"
-                      "test/test3.java" "test/test4.py"))
-        (write-region nil nil file)))
-    ;; Tear down
-    (after-all
-      (delete-directory "test" t))
-
-    (it "Returns all '.c' files when first argument is 'all'."
-      (expect (basic-c-compile--files-to-compile "all"
-                                                 "test/test.c")
-              :to-equal "test.c test1.c test2.c"))
-
-    (it "Returns a selection of files if given one"
-      (expect (basic-c-compile--files-to-compile "selection"
-                                                 "test.c"
-                                                 '("test.c"
-                                                   "test1.c" "test2.c"))
-              :to-equal
-              '("test.c" "test1.c" "test2.c")))
-
-    (it "Returns only to input file if selector is not 'all' or 'selection'"
-      (expect (basic-c-compile--files-to-compile nil
-                                                 "test.c")
-              :to-equal "test.c")))
-
-(defvar test-basic-c-compile-c-small-text
-  "int main () {return(0);}")
-
-(describe "Function: basic-c-compile--sans-makefile"
-          (before-all (shell-command "touch test.c")
-                      (shell-command (format "echo %s > test.c"
-                                             test-basic-c-compile-c-small-text)))
-          (after-all (delete-file "test.c"))
-          (it "Compiles test.c with no extension using clang"
-              (basic-c-compile--sans-makefile "clang"
-                                              "-Wall"
-                                              "test.c"
-                                              "test.c"
-                                              nil)))
+(ert-deftest test-basic-c-compile/c-file-extension-p ()
+  "Test ``basic-c-compile--c-file-extension-p''."
+  (should (basic-c-compile--c-file-extension-p "test.c"))
+  (should (basic-c-compile--c-file-extension-p "test.c.c"))
+  (should (basic-c-compile--c-file-extension-p "test.x.c..n.y.xyz.c"))
+  (should (basic-c-compile--c-file-extension-p "test with space.c"))
+  (should-not (basic-c-compile--c-file-extension-p "test.o"))
+  (should-not (basic-c-compile--c-file-extension-p "test.h"))
+  (should-not (basic-c-compile--c-file-extension-p "test.x.y.dsf..dfs...d"))
+  (should-not (basic-c-compile--c-file-extension-p "test with spaces.x")))
 
 
+;; Fails in sandbox -- Do I need to create my own?
+;; Test with spaced file names
+(ert-deftest test-basic-c-compile/sans-makefile ()
+  "Test ``basic-c-compile--sans-makefile''."
+  (within-sandbox (f-write c-hello-world 'utf-8 "test.c")
+		  (basic-c-compile--sans-makefile "gcc" "" nil "test.c" "o")))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; test-basic-c-compile.el ends here
+(ert-deftest test-basic-c-compile/with-makefile ()
+  "Test ``basic-c-compile--with-makefile''.")
+
+
+(ert-deftest test-basic-c-compile/create-makefile ()
+  "Test ``basic-c-compile--create-makefile''."
+  (within-sandbox (basic-c-compile--create-makefile "gcc"
+						    nil
+						    "test.c"
+						    "o"
+						    ""
+						    "rm *.o"
+						    "Makefile")
+		  (should (equal (f-read "Makefile") makefile)))
+
+(ert-deftest test-basic-c-compile/run-c-file ()
+  "Test ``basic-c-compile--run-c-file''.")
+
+(provide 'basic-c-compile-test)
+
+;;; basic-c-compile-test.el ends here

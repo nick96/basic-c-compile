@@ -43,10 +43,13 @@
 ;; Compilation hangs if basic-c-compile-run-c is called and it find
 ;; that the outfile is out of date.  Press enter to get passed this.
 
+;;; TODO:
+;; Refector to utilise s, f and dash libraries -- makes code cleaner
 
 ;;; Code:
 
 (require 'cl-lib)
+(require 'f)
 
 ;; User customisation
 ;; These can be changed by the user in their init file
@@ -147,7 +150,7 @@ Makefile's INFILE."
 				    basic-c-compile-make-clean
 				    "Makefile"))
 
-;; TODO: Break this down
+;; Refactor this
 ;;;###autoload
 (defun basic-c-compile-file ()
   "Compile file with or without a Makefile.
@@ -223,6 +226,7 @@ compiled before it is run."
 
 ;; Non-interactive functions
 
+;; This is not really non-interactive, put it into basic-c-compile-compile-file?
 (defun basic-c-compile--choose-files ()
   "Return string of SELECTED-FILES which can be entered from the mini-buffer."
   (let ((selected-files (read-string "Enter files: ")))
@@ -231,9 +235,9 @@ compiled before it is run."
 
 (defun basic-c-compile--c-file-extension-p (file-name)
   "Return t if FILE-NAME has extension '.c', otherwise nil."
-  (equal (last (split-string file-name "\\."))
-         '("c")))
+  (equal (f-ext file-name) "c"))
 
+;; Is this function necessary??
 (defun basic-c-compile--files-to-compile (var-files-to-compile
                                           file
                                           &optional str-files-to-compile)
@@ -251,12 +255,10 @@ purposes)."
 				     (directory-files (file-name-directory
 						       file)))))
                     " "))
-        (;; Call function that allows input of files to be compiled
          (equal var-files-to-compile "selection")
          (if str-files-to-compile
              str-files-to-compile
            (basic-c-compile--choose-files)))
-        (;; Default to only compiling the current file
          t (shell-quote-argument file))))
 
 (defun basic-c-compile--sans-makefile (compiler

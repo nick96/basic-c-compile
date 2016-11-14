@@ -1,7 +1,8 @@
 ;;; test-helper --- Test helper for basic-c-compile
 
 ;;; Commentary:
-;; test helper inspired from https://github.com/tonini/overseer.el/blob/master/test/test-helper.el
+;; test helper inspired from
+;; https://github.com/tonini/overseer.el/blob/master/test/test-helper.el
 
 ;;; Code:
 
@@ -20,7 +21,8 @@
   (f-expand "sandbox" basic-c-compile-test-path))
 
 (when (f-exists? basic-c-compile-sandbox-path)
-  (error "Something is already in %s. Check and destroy it yourself" basic-c-compile-sandbox-path))
+  (error "Something is already in %s. Check and destroy it
+  yourself" basic-c-compile-sandbox-path))
 
 (defmacro within-sandbox (&rest body)
   "Evaluate BODY in an empty sandbox directory."
