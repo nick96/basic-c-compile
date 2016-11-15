@@ -29,9 +29,9 @@
   `(let ((default-directory basic-c-compile-sandbox-path))
      (when (f-exists? basic-c-compile-sandbox-path)
        (f-delete default-directory :force))
-     (f-mkdir basic-c-compile-sandbox-path)
-     ,@body
-     (f-delete default-directory :force)))
+     (unwind-protect (progn (f-mkdir basic-c-compile-sandbox-path)
+			    ,@body)
+       (f-delete default-directory :force))))
 
 (require 'ert)
 (require 'el-mock)

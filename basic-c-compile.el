@@ -259,7 +259,7 @@ purposes)."
          (if str-files-to-compile
              str-files-to-compile
            (basic-c-compile--choose-files)))
-         t (shell-quote-argument file))))
+         t (shell-quote-argument file))
 
 (defun basic-c-compile--sans-makefile (compiler
                                        flags
@@ -301,7 +301,7 @@ written to MAKEFILE."
                          "OUTFILE = %s%s\n"
                          "FLAGS = %s\n\n"
                          "build: $(INFILE)\n\t"
-                         "$(CC) $(FLAGS) $(INFILE)  -o $(OUTFILE)\n\n"
+                         "$(CC) $(FLAGS) $(INFILE) -o $(OUTFILE)\n\n"
                          "clean:\n\t%s\n\n"
                          "rebuild: clean build")
                  compiler
