@@ -16,6 +16,9 @@ before_install:
   - make -f emacs-travis.mk install_emacs
   - make -f emacs-travis.mk install_cask
 install:
+  - pip install coveralls
   - cask install
 script:
   - cask exec ert-runner
+after_success:
+  - coveralls
