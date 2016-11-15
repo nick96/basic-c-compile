@@ -6,11 +6,8 @@
 
 ;;; Code:
 
-(require 'undercover)
-(undercover "basic-c-compile.el"
-            (:exclude "*-test.el")
-            (:send-report nil)
-            (:report-file "/tmp/undercover-report.json"))
+(when (require 'undercover nil t)
+  (undercover "*.el" (:exclude "test/*.el")))
 (require 'f)
 
 
