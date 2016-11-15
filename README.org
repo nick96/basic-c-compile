@@ -10,7 +10,6 @@
 #+EXCLUDE_TAGS: noexport
 #+CREATOR: Emacs 24.5.1 (Org mode 8.3.4)
 
-# [[https://travis-ci.org/nick96/basic-c-compile][file:https://travis-ci.org/nick96/basic-c-compile.svg]]
 # [[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
 # [[http://stable.melpa.org/#/basic-c-compile][file:http://stable.melpa.org/packages/basic-c-compile-badge.svg]]
 # [[https://github.com/nick96/basic-c-compile/tags][file:https://img.shields.io/github/tag/nick96/basic-c-compile.svg]]
@@ -18,10 +17,12 @@
 
 [[http://melpa.org/#/basic-c-compile][file:http://melpa.org/packages/basic-c-compile-badge.svg]]
 [[https://badges.mit-license.org/][file:https://img.shields.io/github/license/mashape/apistatus.svg]]
+[[https://travis-ci.org/nick96/basic-c-compile][file:https://travis-ci.org/nick96/basic-c-compile.svg?branch=master]]
 
-This is a script for the basic actions involved in compiling and
-running a C file.  It will be able to create a basic Makefile of the
-form:
+The purpose of this package is to automate come of the basic and
+repetetive tasks involved in C programming. All the tasks that this
+pacakge automate are language agnostic and whilst the defaults are C
+specific you can set them to any statically compiled language.
 
 #+BEGIN_SRC makefile
   CC = <compiler set by basic-c-compile-compiler>
@@ -40,7 +41,7 @@ form:
 *Note*: =INFILE= can also be a list of files depending on what
 =basic-c-compile-all-files= is set to.
 
-This package allows three commands to be called: =basic-c-compile-file=,
+This pacakge has three entry points: =basic-c-compile-file=,
 =basic-c-compile-makefile= and =basic-c-compile-run-c=.
 
 ** basic-c-compile-file
