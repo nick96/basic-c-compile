@@ -7,12 +7,12 @@
 ;;; Code:
 
 (require 'undercover)
-(undercover "*.el"
+(undercover "basic-c-compile.el"
             (:exclude "*-test.el")
             (:send-report nil)
             (:report-file "/tmp/undercover-report.json"))
 (require 'f)
-(require 'basic-c-compile)
+
 
 (defvar cpt-path
   (f-parent (f-this-file)))
@@ -39,11 +39,6 @@
 			    ,@body)
        (f-delete default-directory :force))))
 
-(require 'ert)
-(require 'el-mock)
-(eval-when-compile
-    (require 'cl))
-(require 'basic-c-compile)
 
 (provide 'test-helper)
 ;;; test-helper.el ends here

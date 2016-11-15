@@ -1,3 +1,10 @@
+2016-11-15  Nick Spain  <nicholas.spain96@gmail.com>
+
+	* test/basic-c-compile-test.el: Add tests, they are all passing at
+	the moment.
+	* basic-c-compile.el: Replace some of the more verbose parts of
+	the code with equivalent functions from the 's' and 'f' libraries.
+
 2016-11-13  Nick Spain  <nicholas.spain96@gmail.com>
 
 	* ChangeLog: Create change log, merge changelog sections from

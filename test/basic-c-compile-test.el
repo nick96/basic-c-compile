@@ -4,11 +4,11 @@
 ;; Tests for package basic-c-compile.
 ;;; Code:
 
-(require 'basic-c-compile)
-(require 'ert)
+
 (require 'test-helper)
-(require 'f)
 (require 's)
+(require 'ert)
+(require 'basic-c-compile)
 
 (setq c-hello-world (s-join "\n" '("#include <stdio.h>"
 				     "int main (int argc, char *argv[]) {"
