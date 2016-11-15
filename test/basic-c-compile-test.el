@@ -60,8 +60,10 @@
    (f-write c-hello-world 'utf-8 "test.c")
    (f-write c-hello-world 'utf-8 "test with spaces.c")
    (should (basic-c-compile--sans-makefile "gcc" "" "test.c" "test.c" "o"))
+   (kill-compilation)
    (should (basic-c-compile--sans-makefile "gcc" "" "test.c"
-					   "test with spaces.c" "o"))))
+					   "test with spaces.c" "o")))
+  (kill-compilation))
 
 (ert-deftest test-basic-c-compile/with-makefile ()
   "Test ``basic-c-compile--with-makefile''."
@@ -76,6 +78,7 @@
 				     "rm *.o"
 				     "Makefile")
    (should (basic-c-compile--with-makefile ""))
+   (kill-compilation)
    (basic-c-compile--create-makefile "gcc"
 				     "test with spaces.c"
 				     "test with spaces.c"
@@ -83,7 +86,8 @@
 				     "-Wall"
 				     "rm *.o"
 				     "Makefile")
-   (should (basic-c-compile--with-makefile ""))))
+   (should (basic-c-compile--with-makefile ""))
+   (kill-compilation)))
 
 
 (ert-deftest test-basic-c-compile/create-makefile ()
