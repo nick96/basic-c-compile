@@ -3,24 +3,17 @@ sudo: no
 matrix:
   fast_finish: true
   allow_failures:
-    - env: EMACS_VERSION=snapshot
-python:
-  - 3.5
+    - env: EVM_EMACS=snapshot-travis
 env:
-  EMACS_VERSION=24.3
-  EMACS_VERSION=24.4
-  EMACS_VERSION=24.5
-  EMACS_VERSION=25.1
-  EMACS_VERSION=snapshot
+  EVM_EMACS=24.3-travis
+  EVM_EMACS=24.4-travis
+  EVM_EMACS=24.5-travis
+  EVM_EMACS=25.1-travis
+  EVM_EMACS=snapshot-travis
 before_install:
-  - export PATH="$HOME/bin:$PATH"
-  - wget 'https://raw.githubusercontent.com/flycheck/emacs-travis/master/emacs-travis.mk'
-  - make -f emacs-travis.mk install_emacs
-  - make -f emacs-travis.mk install_cask
+ - curl -fsSkL https://gist.github.com/rejeep/ebcd57c3af83b049833b/raw > travis.sh && source ./travis.sh
+ - evm install "$EVM_EMACS" --use --skip
 install:
-  - pip3 install coveralls
   - cask install
 script:
   - cask exec ert-runner
-after_success:
-  - coveralls
