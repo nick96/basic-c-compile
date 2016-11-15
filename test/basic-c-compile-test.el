@@ -12,7 +12,7 @@
 
 (setq c-hello-world (s-join "\n" '("#include <stdio.h>"
 				     "int main (int argc, char *argv[]) {"
-				     "    printf(\"Hello, World\\n\");"
+				     "    printf(\"Hello, World\");"
 				     "}")))
 
 (setq makefile-str-single
@@ -54,7 +54,6 @@
   (should-not (basic-c-compile--c-file-extension-p "test with spaces.x")))
 
 
-;; Test with spaced file names
 (ert-deftest test-basic-c-compile/sans-makefile ()
   "Test ``basic-c-compile--sans-makefile''."
   (within-sandbox
@@ -64,8 +63,27 @@
    (should (basic-c-compile--sans-makefile "gcc" "" "test.c"
 					   "test with spaces.c" "o"))))
 
-;; (ert-deftest test-basic-c-compile/with-makefile ()
-;;   "Test ``basic-c-compile--with-makefile''.")
+(ert-deftest test-basic-c-compile/with-makefile ()
+  "Test ``basic-c-compile--with-makefile''."
+  (within-sandbox
+   (f-write c-hello-world 'utf-8 "test.c")
+   (f-write c-hello-world 'utf-8 "test with spaces.c")
+   (basic-c-compile--create-makefile "gcc"
+				     "test.c"
+				     "test.c"
+				     "o"
+				     "-Wall"
+				     "rm *.o"
+				     "Makefile")
+   (should (basic-c-compile--with-makefile ""))
+   (basic-c-compile--create-makefile "gcc"
+				     "test with spaces.c"
+				     "test with spaces.c"
+				     "o"
+				     "-Wall"
+				     "rm *.o"
+				     "Makefile")
+   (should (basic-c-compile--with-makefile ""))))
 
 
 (ert-deftest test-basic-c-compile/create-makefile ()
@@ -84,7 +102,7 @@
    (mapc (lambda (file) (f-write "foo" 'utf-8 file)) (s-split " " files))
    ;; Test that Makefile creation works for a given string of files
    (basic-c-compile--create-makefile "gcc"
-				     files
+				     (s-split " " files)
 				     "foo.c"
 				     "o"
 				     "-Wall"
@@ -92,11 +110,7 @@
 				     "Makefile")
    (should (equal (f-read "Makefile") (format makefile-str-all files))))))
 
-;; (ert-deftest test-basic-c-compile/run-c-file ()
-;;   "Test ``basic-c-compile--run-file''.")
-
 ;; (ert-run-tests-interactively t)
-
 (provide 'basic-c-compile-test)
 
 ;;; basic-c-compile-test.el ends here
