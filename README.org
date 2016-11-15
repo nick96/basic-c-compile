@@ -10,10 +10,7 @@
 #+EXCLUDE_TAGS: noexport
 #+CREATOR: Emacs 24.5.1 (Org mode 8.3.4)
 
-# [[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
-# [[http://stable.melpa.org/#/basic-c-compile][file:http://stable.melpa.org/packages/basic-c-compile-badge.svg]]
-# [[https://github.com/nick96/basic-c-compile/tags][file:https://img.shields.io/github/tag/nick96/basic-c-compile.svg]]
-# [[https://gitter.im/nick96/basic-c-compile][file:https://badges.gitter.im/Join%20Chat.svg]]
+[[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
 
 [[http://melpa.org/#/basic-c-compile][file:http://melpa.org/packages/basic-c-compile-badge.svg]]
 [[https://badges.mit-license.org/][file:https://img.shields.io/github/license/mashape/apistatus.svg]]

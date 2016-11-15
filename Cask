@@ -15,5 +15,6 @@
 (development
  (depends-on "ert")
  (depends-on "cask-package-toolset")
+ (depends-on "ert-runner")
  (depends-on "el-mock")
- (depends-on "ert-runner"))
+ (depends-on "undercover"))

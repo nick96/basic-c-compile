@@ -6,7 +6,13 @@
 
 ;;; Code:
 
+(require 'undercover)
+(undercover "*.el"
+            (:exclude "*-test.el")
+            (:send-report nil)
+            (:report-file "/tmp/undercover-report.json"))
 (require 'f)
+(require 'basic-c-compile)
 
 (defvar cpt-path
   (f-parent (f-this-file)))
