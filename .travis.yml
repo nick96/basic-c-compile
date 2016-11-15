@@ -12,7 +12,7 @@ env:
   - EVM_EMACS=emacs-24.5-travis
 script:
   - emacs --version
-  - make test
+  - cask exec ert-runner
 
 notifications:
-  email: false
+  email: true
