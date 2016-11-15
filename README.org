@@ -10,11 +10,11 @@
 #+EXCLUDE_TAGS: noexport
 #+CREATOR: Emacs 24.5.1 (Org mode 8.3.4)
 
-[[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
 
 [[http://melpa.org/#/basic-c-compile][file:http://melpa.org/packages/basic-c-compile-badge.svg]]
 [[https://badges.mit-license.org/][file:https://img.shields.io/github/license/mashape/apistatus.svg]]
 [[https://travis-ci.org/nick96/basic-c-compile][file:https://travis-ci.org/nick96/basic-c-compile.svg?branch=master]]
+[[https://coveralls.io/r/nick96/basic-c-compile][file:https://coveralls.io/repos/nick96/basic-c-compile/badge.svg]]
 
 The purpose of this package is to automate come of the basic and
 repetetive tasks involved in C programming. All the tasks that this
