@@ -2,6 +2,10 @@
 
 ;;; Commentary:
 ;; Tests for package basic-c-compile.
+
+;;; TODO:
+;; Find a better way than just (kill-compilation)
+
 ;;; Code:
 
 

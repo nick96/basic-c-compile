@@ -26,7 +26,7 @@
 ;; Version: 1.5.9
 ;; Keywords: C, Makefile, compilation, convenience
 ;; URL: https://github.com/nick96/basic-c-compile
-;; Package-Requires: ((cl-lib "0.5"))
+;; Package-Requires: ((cl-lib "0.5") (f "0.19.0"))
 
 ;;; Commentary:
 
@@ -44,7 +44,8 @@
 ;; that the outfile is out of date.  Press enter to get passed this.
 
 ;;; TODO:
-;; Refector to utilise s, f and dash libraries -- makes code cleaner
+;; Refactor to utilise s, f and dash libraries -- makes code cleaner
+;; Remove rebuild in Makefile -- Make does this for us
 
 ;;; Code:
 
