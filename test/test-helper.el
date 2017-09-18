@@ -36,6 +36,4 @@
 			    ,@body)
        (f-delete default-directory :force))))
 
-
-; (provide 'test-helper)
 ;;; test-helper.el ends here

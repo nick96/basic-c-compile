@@ -9,7 +9,6 @@
 ;;; Code:
 
 
-(require 'test-helper)
 (require 's)
 (require 'ert)
 (require 'basic-c-compile)
