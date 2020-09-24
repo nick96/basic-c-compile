@@ -127,6 +127,16 @@ means you will have to change this variable as well."
   :options '("find . -type f -executable -delete"
              "gfind . -type f -executable -delete"))
 
+(defcustom basic-c-compile-comint t
+  "Boolean option for using Comint mode or not.
+
+This variable is set to true by default.  It determines that
+Comint mode is used in *compilation* buffer so that user input is
+possible when interacting with the executing program."
+  :group 'basic-c-compile
+  :type 'boolean
+  :options '(nil))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -249,11 +259,11 @@ purposes)."
 				     (directory-files (file-name-directory
 						       file)))))
                     " "))
-         ((equal var-files-to-compile "selection")
+        ((equal var-files-to-compile "selection")
          (if str-files-to-compile
              str-files-to-compile
            (read-string "Enter files:")))
-         (t (shell-quote-argument file))))
+        (t (shell-quote-argument file))))
 
 (defun basic-c-compile--sans-makefile (compiler
                                        flags
@@ -322,7 +332,8 @@ written to MAKEFILE."
   (compile (format "./%s%s"
                    (shell-quote-argument (file-name-sans-extension file))
                    (if extension
-                       (format ".%s" extension) ""))))
+                       (format ".%s" extension) ""))
+	   basic-c-compile-comint))
 
 
 (provide 'basic-c-compile)
